@@ -1,12 +1,3 @@
 # HeisNik.github.io
 
-title: "Portfolio"
-author: 
-  name: "Niko Heiskanen"
-  email: "nikoheiska@icloud.com"
-description: "I am an Information and Communication Technology student with a strong passion for full-stack application development and cybersecurity. 
-Through my studies and personal projects, I have gained experience with the latest technologies,
-such as React for frontend development and Node.js for backend development."
-social:
-  github: "https://github.com/HeisNik/"
-  linkedin: "https://www.linkedin.com/in/niko-heiskanen-47a54a2a8/"
+
