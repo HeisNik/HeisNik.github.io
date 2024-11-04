@@ -1,8 +1,5 @@
 # HeisNik.github.io
 ---
-layout: default
-title: "Portfolio"
----
 
 # Niko Heiskanen
 
