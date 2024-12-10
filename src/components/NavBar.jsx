@@ -30,7 +30,6 @@ const navItems = [
   { name: 'Connect', to: 'contact' }
 ];
 
-console.log('navItems.map(item => item.to)', navItems.map(item => item.to))
 
 function DrawerAppBar(props) {
   const { window } = props;
