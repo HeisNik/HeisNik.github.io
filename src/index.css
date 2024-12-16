@@ -33,6 +33,12 @@ h2 {
   font-style: normal;
   color: turquoise;
 }
+
+h6 {
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+  color: turquoise;
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;
