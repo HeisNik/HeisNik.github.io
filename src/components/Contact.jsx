@@ -16,7 +16,7 @@ const ContactContainer = styled.div`
   margin: 0 auto;
   gap: 20px;
   border-radius: 10px;
-  //box-shadow: 0 4px 8px rgba(0, 0, 0, 1.1);
+  margin-bottom: 50px;
 `;
 
 const Header = styled.h1`
