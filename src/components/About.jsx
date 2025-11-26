@@ -1,27 +1,33 @@
-import { div } from "framer-motion/client"
 import styled from 'styled-components';
 
-
-const CardContainer = styled.div`
+const AboutWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
   padding-top: 50px;
+  box-sizing: border-box; /* Padding lasketaan mukaan leveydessä */
+  scroll-margin-top: 76px; /* Mobile: 56px NavBar + 20px padding */
+  
+  @media (min-width: 768px) {
+    scroll-margin-top: 117.78px; /* Desktop: 97.78px NavBar + 20px padding */
+  }
 `;
 
 const AboutContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #1e1e1e;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease-in-out;
-  padding: 20px;
+  width: 100%;
+  padding: 20px; /* Mobile/Tablet default */
   
-  
-
-  @media (min-width: 768px) {
-  margin: 20px;
-  padding: 25px 0 50px;
-    
-    
+  @media (min-width: 1024px) {
+    padding: 40px; /* Desktop */
   }
 `;
 
@@ -37,15 +43,15 @@ const Header = styled.h1`
 const Text = styled.div`
   color: white;
   width: 100%;
-  max-width: 1000px;
-  margin: 20px auto;
+  
+  
   font-size: 1.4em;
 `;
 
 const About = () => {
     return (
-            <CardContainer id="about">
-            <AboutContainer >
+            <AboutWrapper id="about">
+            <AboutContainer>
             <Header>About me</Header>
             <Text>
             I am an Information and Communication Technology student with a strong passion for full-stack application development and cybersecurity. 
@@ -58,7 +64,7 @@ I actively keep up with the latest cybersecurity trends and techniques to enhanc
 My commitment to growth in this field is exemplified by my independent studies of Cisco cybersecurity courses, such as <i>Introduction to Cyber Security</i> and <i>Ethical Hacking</i>.
 </Text>
             </AboutContainer>
-            </CardContainer>
+            </AboutWrapper>
     )
 }
 
