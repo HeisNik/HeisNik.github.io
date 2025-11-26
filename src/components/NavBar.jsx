@@ -14,11 +14,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import Hero from './Hero'
-import About from './About'
-import Skills from './Skills'
-import Projects from './Projects'
-import Contact from './Contact'
 import { Link } from 'react-scroll';
 
 const drawerWidth = 240;
@@ -42,7 +37,7 @@ function DrawerAppBar(props) {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        Portfolio
+        Niko Heiskanen
       </Typography>
       <Divider />
       <List >
@@ -71,18 +66,18 @@ function DrawerAppBar(props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }}
           >
-            <h2>Developer Portfolio</h2>
+            <h2>Niko Heiskanen</h2>
           </Typography>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             {navItems.map((item) => (
               <Button key={item.name} sx={{ color: '#ff4081', fontWeight: 'bold', textTransform: 'uppercase' }}>
                 <Link to={item.to} smooth={true} duration={500}>
@@ -103,7 +98,7 @@ function DrawerAppBar(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
+            display: { xs: 'block', md: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#333', color: '#ff4081' },
           }}
         >
