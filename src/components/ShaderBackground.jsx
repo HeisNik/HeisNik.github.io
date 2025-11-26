@@ -1,5 +1,9 @@
+ /*Ensure you had installed the package
+or read our installation document. (go to lightswind.com/components/Installation)
+npm i lightswind@latest*/
+
+"use client";
 import { useEffect, useRef, useState } from "react";
-import PropTypes from 'prop-types';
 
 const vertexShaderSource = `
   attribute vec4 a_position;
@@ -12,27 +16,18 @@ const fragmentShaderSource = `
 precision mediump float;
 uniform vec2 iResolution; // Canvas resolution (width, height)
 uniform float iTime;       // Time in seconds since the animation started
-uniform vec2 iMouse;      // Mouse coordinates (x, y)
 uniform vec3 u_color;     // Custom color uniform
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord){
     vec2 uv = (1.0 * fragCoord - iResolution.xy) / min(iResolution.x, iResolution.y);
     float t = iTime * 0.5;
 
-    vec2 mouse_uv = (4.0 * iMouse - iResolution.xy) / min(iResolution.x, iResolution.y);
-
-    float mouseInfluence = 0.0;
-    if (length(iMouse) > 0.0) {
-        float dist_to_mouse = distance(uv, mouse_uv);
-        mouseInfluence = smoothstep(0.8, 0.0, dist_to_mouse);
-    }
-
     for(float i = 8.0; i < 20.0; i++) {
         uv.x += 0.6 / i * cos(i * 2.5 * uv.y + t);
         uv.y += 0.6 / i * cos(i * 1.5 * uv.x + t);
     }
 
-    float wave = abs(sin(t - uv.y - uv.x + mouseInfluence * 8.0));
+    float wave = abs(sin(t - uv.y - uv.x));
     float glow = smoothstep(0.9, 0.0, wave);
 
     vec3 color = glow * u_color; // Use the custom color here
@@ -46,7 +41,18 @@ void main() {
 `;
 
 /**
- * Valid blur sizes supported by Tailwind CSS.
+ * @typedef {Object} ShaderBackgroundProps
+ * @property {string} [backdropBlurAmount] - The size of the backdrop blur to apply.
+ * Valid values are "none", "sm", "md", "lg", "xl", "2xl", "3xl".
+ * Defaults to "sm" if not provided.
+ * @property {string} [color] - The color of the shader's glow in hexadecimal format (e.g., "#RRGGBB").
+ * Defaults to "#471CE2" (purple) if not provided.
+ * @property {string} [className] - Additional CSS classes to apply to the container div.
+ */
+
+/**
+ * A mapping from simplified blur size names to full Tailwind CSS backdrop-blur classes.
+ * This ensures Tailwind's JIT mode can correctly detect and generate the CSS.
  */
 const blurClassMap = {
   none: "backdrop-blur-none",
@@ -59,25 +65,27 @@ const blurClassMap = {
 };
 
 /**
- * A React component that renders an interactive WebGL shader background.
- * The background features a turbulent, glowing wave pattern that responds to mouse movement.
+ * A React component that renders an animated WebGL shader background.
+ * The background features a turbulent, glowing wave pattern that animates over time.
  * An optional backdrop blur can be applied over the shader.
  *
- * @param {Object} props - The component props.
- * @param {string} [props.backdropBlurAmount='sm'] - The size of the backdrop blur to apply.
- * Valid values are "none", "sm", "md", "lg", "xl", "2xl", "3xl".
- * @param {string} [props.color='#07eae6ff'] - The color of the shader's glow in hexadecimal format (e.g., "#RRGGBB").
- * @param {string} [props.className=''] - Additional CSS classes to apply to the container div.
+ * @param {ShaderBackgroundProps} props - The component props.
  * @returns {JSX.Element} The rendered ShaderBackground component.
  */
 function ShaderBackground({
   backdropBlurAmount = "sm",
-  color = "#07eae6ff", // Default cyan color
+  color = "#07eae6ff", // Default purple color
   className = "",
 }) {
   const canvasRef = useRef(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const isFixed = className.includes('fixed');
+  // Initialize canvasSize with viewport dimensions if fixed, otherwise 0
+  const [canvasSize, setCanvasSize] = useState(() => {
+    if (typeof window !== 'undefined' && isFixed) {
+      return { width: window.innerWidth, height: window.innerHeight };
+    }
+    return { width: 0, height: 0 };
+  });
 
   // Helper to convert hex color to RGB (0-1 range)
   const hexToRgb = (hex) => {
@@ -144,7 +152,6 @@ function ShaderBackground({
 
     const iResolutionLocation = gl.getUniformLocation(program, "iResolution");
     const iTimeLocation = gl.getUniformLocation(program, "iTime");
-    const iMouseLocation = gl.getUniformLocation(program, "iMouse");
     const uColorLocation = gl.getUniformLocation(program, "u_color"); // Get uniform location for custom color
 
     let startTime = Date.now();
@@ -153,79 +160,100 @@ function ShaderBackground({
     const [r, g, b] = hexToRgb(color);
     gl.uniform3f(uColorLocation, r, g, b);
 
-    const render = () => {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
+    const updateCanvasSize = () => {
+      // For fixed positioning, use viewport dimensions; otherwise use canvas dimensions
+      const width = isFixed ? window.innerWidth : canvas.clientWidth;
+      const height = isFixed ? window.innerHeight : canvas.clientHeight;
       canvas.width = width;
       canvas.height = height;
+      setCanvasSize({ width, height });
       gl.viewport(0, 0, width, height);
+      gl.uniform2f(iResolutionLocation, width, height);
+    };
+
+    const render = () => {
+      updateCanvasSize();
 
       const currentTime = (Date.now() - startTime) / 1000;
 
-      gl.uniform2f(iResolutionLocation, width, height);
       gl.uniform1f(iTimeLocation, currentTime);
-      gl.uniform2f(
-        iMouseLocation,
-        isHovering ? mousePosition.x : 0,
-        isHovering ? height - mousePosition.y : 0
-      );
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       requestAnimationFrame(render);
     };
 
-    const handleMouseMove = (event) => {
-      const rect = canvas.getBoundingClientRect();
-      setMousePosition({
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      });
-    };
-
-    const handleMouseEnter = () => {
-      setIsHovering(true);
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovering(false);
-      setMousePosition({ x: 0, y: 0 });
-    };
-
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseenter", handleMouseEnter);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
-
     render();
 
-    return () => {
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseenter", handleMouseEnter);
-      canvas.removeEventListener("mouseleave", handleMouseLeave);
+    // Add resize listener to update canvas when viewport changes
+    const handleResize = () => {
+      if (isFixed && canvas) {
+        updateCanvasSize();
+      }
     };
-  }, [isHovering, mousePosition, color]); // Add color to the dependency array
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [color, isFixed]);
 
   // Get the correct Tailwind CSS class from the map
   const finalBlurClass =
     blurClassMap[backdropBlurAmount] || blurClassMap["sm"];
 
+  // If className contains 'fixed' or 'absolute', remove inset-0 and z-index classes, use inline styles instead
+  const isPositioned = className.includes('fixed') || className.includes('absolute');
+  // Remove 'inset-0' and 'z-0'/'z-10' etc from className to avoid conflicts with inline styles
+  const cleanedClassName = isPositioned 
+    ? className
+        .replace(/\binset-0\b/g, '')
+        .replace(/\bz-\d+\b/g, '')
+        .trim()
+        .replace(/\s+/g, ' ')
+    : `w-full h-full overflow-hidden ${className}`;
+  const containerClasses = cleanedClassName;
+
+  // Canvas always uses absolute positioning to fill its parent
+  // For fixed positioning, use explicit width/height to match canvas.width/height
+  const canvasClasses = isFixed 
+    ? "absolute inset-0" 
+    : "absolute inset-0 w-full h-full";
+
+  // For fixed positioning, ensure canvas CSS size matches canvas.width/height
+  const canvasStyle = isFixed && canvasSize.width > 0
+    ? { 
+        display: "block", 
+        pointerEvents: "none",
+        width: `${canvasSize.width}px`,
+        height: `${canvasSize.height}px`
+      }
+    : { display: "block", pointerEvents: "none" };
+
+  // For fixed positioning, ensure it's truly fixed with inline styles
+  // Use top/left/right/bottom instead of width/height to avoid scrollbar issues
+  const containerStyle = isFixed 
+    ? { 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        zIndex: -1 
+      }
+    : {};
+
   return (
-    <div className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}>
+    <div className={containerClasses} style={containerStyle}>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full overflow-hidden"
-        style={{ display: "block" }}
+        className={canvasClasses}
+        style={canvasStyle}
       />
-      {/* Apply the mapped Tailwind CSS class for backdrop blur */}
-      <div className={`absolute inset-0 ${finalBlurClass}`}></div>
+      {/* Apply the mapped Tailwind CSS class for backdrop blur - ensure it's behind content */}
+      <div className={`absolute inset-0 ${finalBlurClass}`} style={{ zIndex: -1 }}></div>
     </div>
   );
 }
 
-ShaderBackground.propTypes = {
-  backdropBlurAmount: PropTypes.string,
-  color: PropTypes.string,
-  className: PropTypes.string,
-};
-
 export default ShaderBackground;
-
