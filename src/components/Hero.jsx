@@ -1,7 +1,3 @@
-import { blue, blueGrey } from "@mui/material/colors"
-import { color } from "framer-motion"
-import { div } from "framer-motion/client"
-import React from 'react';
 import styled from 'styled-components';
 
 
@@ -11,18 +7,24 @@ const HeroContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
   padding: 20px;
+  padding-top: 76px; /* 20px + 56px NavBar mobile */
   width: 100%; 
   max-width: 1200px; 
-  margin: 40px auto;
+  margin: 0 auto;
   
   
 
   @media (min-width: 768px) {
     flex-direction: row;
-    margin-bottom: 150px;
-    gap: 150px;
-    padding: 150px 20px 20px 20px; 
+    gap: 60px; /* Pienempi gap tabletille */
+    padding: 20px;
+    padding-top: 117.78px; /* 20px + 97.78px NavBar tablet/desktop */
+  }
+
+  @media (min-width: 1024px) {
+    gap: 150px; /* Isompi gap desktopille */
   }
 `;
 
@@ -53,7 +55,7 @@ const Hero = () => {
     <div id="hero">
     <HeroContainer>
       <Text>
-        <b style={{ color: "white" }}>I'm Niko Heiskanen</b> <br /> Full Stack Developer <b style={{ color: "white" }}>and</b> <b style={{ color: "red" }}>Cyber Security Enthusiast</b>
+        <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br /> Full Stack Developer <b style={{ color: "white" }}>and</b> <b style={{ color: "red" }}>Cyber Security Enthusiast</b>
       </Text>
       <Image src={`/images/IMG_9916.jpg`} alt="Description" />
     </HeroContainer>
