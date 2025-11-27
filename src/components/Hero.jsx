@@ -15,6 +15,7 @@ const HeroContainer = styled.div`
   margin: 0 auto;
   
   
+  
 
   @media (min-width: 768px) {
     flex-direction: row;
@@ -41,7 +42,7 @@ const Text = styled.h1`
 const Image = styled.img`
   width: 100%;
   max-width: 400px;
-  border-radius: 10px;
+  border-radius: 20px;
   box-shadow: 0 4px 8px rgba(1.2, 1.2, 1.2, 1.2);
   transition: box-shadow 0.6s ease-in-out;
 

@@ -48,10 +48,10 @@ const SkillsContainer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: 150px;
 
   @media (min-width: 768px) {
     align-items: flex-start;
+    margin-bottom: 150px;
   }
 `;
 

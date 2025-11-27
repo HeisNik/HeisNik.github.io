@@ -80,7 +80,7 @@ function DrawerAppBar(props) {
           <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             {navItems.map((item) => (
               <Button key={item.name} sx={{ color: '#ff4081', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                <Link to={item.to} smooth={true} duration={500} offset={-120}>
+                <Link to={item.to} smooth={true} duration={500} >
                   {item.name}
                 </Link>
               </Button>

@@ -5,12 +5,13 @@ const AboutWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  padding-top: 50px;
+  padding-top: 76px; /* Mobile: NavBarin korkeus */
   box-sizing: border-box; /* Padding lasketaan mukaan leveydessä */
-  scroll-margin-top: 76px; /* Mobile: 56px NavBar + 20px padding */
+  
   
   @media (min-width: 768px) {
-    scroll-margin-top: 117.78px; /* Desktop: 97.78px NavBar + 20px padding */
+    padding-top: 117.78px; /* Desktop: NavBarin korkeus */
+    padding-bottom: 100px; /* Desktop */
   }
 `;
 
@@ -20,11 +21,12 @@ const AboutContainer = styled.div`
   align-items: center;
   justify-content: center;
   background-color: #1e1e1e;
-  border-radius: 10px;
+  border-radius: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease-in-out;
   width: 100%;
   padding: 20px; /* Mobile/Tablet default */
+  
   
   @media (min-width: 1024px) {
     padding: 40px; /* Desktop */
@@ -51,6 +53,7 @@ const Text = styled.div`
 const About = () => {
     return (
             <AboutWrapper id="about">
+              
             <AboutContainer>
             <Header>About me</Header>
             <Text>
