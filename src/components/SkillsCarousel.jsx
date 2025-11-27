@@ -10,17 +10,25 @@ const rotateHorizontal = keyframes`
   100% { transform: translateX(-50%); }
 `;
 
+const SkillsWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+ 
+  padding-top: 50px;
+  box-sizing: border-box;
+  overflow: hidden;
+  
+`;
+
 const SkillsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  overflow: hidden;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-   margin-bottom: 150px;
+  margin-bottom: 150px;
+ 
 
   @media (min-width: 768px) {
     align-items: flex-start;
@@ -90,56 +98,10 @@ const IconContainer = styled.div`
 `;
 
 const SkillsCarousel = ({ isMobile }) => (
-  <SkillsContainer id="skills">
-    <Header>Skills</Header>
-    <IconWrapper>
-      <IconContainer>
-        <div>
-          <FaReact size={75} color="#61dafb" />
-          <p>React</p>
-        </div>
-        <div>
-          <FaNodeJs size={75} color="#68a063" />
-          <p>Node.js</p>
-        </div>
-        <div>
-          <FaPython size={75} color="#336791" />
-          <p>Python</p>
-        </div>
-        <div>
-          <BiLogoPostgresql size={75} color="#336791" />
-          <p>PostgreSQL</p>
-        </div>
-        <div>
-          <BiLogoMongodb size={75} color="#68a063" />
-          <p>MongoDB</p>
-        </div>
-        <div>
-          <GrGraphQl size={75} color="#e10098" />
-          <p>GraphQL</p>
-        </div>
-        <div>
-          <FaDocker size={75} color="#0077B5" />
-          <p>Docker</p>
-        </div>
-        <div>
-          <SiSpring size={75} color="#68a063" />
-          <p>Java Spring</p>
-        </div>
-        <div>
-          <SiRender size={75} color="black" />
-          <p>Render</p>
-        </div>
-        <div>
-          <VscAzure size={75} color="#0077B5" />
-          <p>Azure</p>
-        </div>
-        <div>
-          <SiKalilinux size={75} color="black" />
-          <p>Kali Linux</p>
-        </div>
-      </IconContainer>
-      {!isMobile && (
+  <SkillsWrapper id="skills">
+    <SkillsContainer>
+      <Header>Skills</Header>
+      <IconWrapper>
         <IconContainer>
           <div>
             <FaReact size={75} color="#61dafb" />
@@ -186,9 +148,57 @@ const SkillsCarousel = ({ isMobile }) => (
             <p>Kali Linux</p>
           </div>
         </IconContainer>
-      )}
-    </IconWrapper>
-  </SkillsContainer>
+        {!isMobile && (
+          <IconContainer>
+            <div>
+              <FaReact size={75} color="#61dafb" />
+              <p>React</p>
+            </div>
+            <div>
+              <FaNodeJs size={75} color="#68a063" />
+              <p>Node.js</p>
+            </div>
+            <div>
+              <FaPython size={75} color="#336791" />
+              <p>Python</p>
+            </div>
+            <div>
+              <BiLogoPostgresql size={75} color="#336791" />
+              <p>PostgreSQL</p>
+            </div>
+            <div>
+              <BiLogoMongodb size={75} color="#68a063" />
+              <p>MongoDB</p>
+            </div>
+            <div>
+              <GrGraphQl size={75} color="#e10098" />
+              <p>GraphQL</p>
+            </div>
+            <div>
+              <FaDocker size={75} color="#0077B5" />
+              <p>Docker</p>
+            </div>
+            <div>
+              <SiSpring size={75} color="#68a063" />
+              <p>Java Spring</p>
+            </div>
+            <div>
+              <SiRender size={75} color="black" />
+              <p>Render</p>
+            </div>
+            <div>
+              <VscAzure size={75} color="#0077B5" />
+              <p>Azure</p>
+            </div>
+            <div>
+              <SiKalilinux size={75} color="black" />
+              <p>Kali Linux</p>
+            </div>
+          </IconContainer>
+        )}
+      </IconWrapper>
+    </SkillsContainer>
+  </SkillsWrapper>
 );
 
 export default SkillsCarousel;

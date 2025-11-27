@@ -5,15 +5,17 @@ import Hero from './components/Hero'
 import About from './components/About'
 import Projects from './components/Projects'
 import Contact from './components/Contact'
-import SkillsCarousel from './components/SkillsCarousel'
+import SkillsCarouselCopy from './components/SkillsCarouselCopy'
 import ShaderBackground from './components/ShaderBackground'
 
 function App() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1000);
+  const [isMediumScreen, setIsMediumScreen] = useState(window.innerWidth > 1000 && window.innerWidth <= 1150);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 1000);
+      setIsMediumScreen(window.innerWidth > 1000 && window.innerWidth <= 1150);
     };
 
     window.addEventListener('resize', handleResize);
@@ -32,7 +34,7 @@ function App() {
         <NavBar/>
         <Hero/>
         <About/>
-        <SkillsCarousel isMobile={isMobile} />
+        <SkillsCarouselCopy isMobile={isMobile} isMediumScreen={isMediumScreen} />
         <Projects/>
         <Contact/>
       </div>
