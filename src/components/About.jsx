@@ -1,74 +1,105 @@
+import { useRef } from 'react';
 import styled from 'styled-components';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 
-const AboutWrapper = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  padding-top: 76px; /* Mobile: NavBarin korkeus */
-  box-sizing: border-box; /* Padding lasketaan mukaan leveydessä */
-  
-  
-  @media (min-width: 768px) {
-    padding-top: 117.78px; /* Desktop: NavBarin korkeus */
-    padding-bottom: 100px; /* Desktop */
-  }
+const MainSection = styled.section`
+  position: relative;
+  height: 400vh; /* Kuinka pitkään horisontaalinen scroll kestää */
+  background: transparent;
 `;
 
-const AboutContainer = styled.div`
+const StickyWrapper = styled.div`
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const HorizontalContainer = styled(motion.div)`
+  display: flex;
+  gap: clamp(3rem, 8vw, 10rem);
+  padding: 0 clamp(6vw, 8vw, 10vw);
+`;
+
+const ContentCard = styled.div`
+  flex-shrink: 0;
+  width: 82vw;
+  max-width: 820px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  background-color: #1e1e1e;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease-in-out;
-  width: 100%;
-  padding: 20px; /* Mobile/Tablet default */
-  
-  
-  @media (min-width: 1024px) {
-    padding: 40px; /* Desktop */
-  }
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 `;
 
-const Header = styled.h1`
+const CardTitle = styled.h2`
   color: turquoise;
-  width: 100%;
-  text-align: center;
-  
-  font-size: 5.2em;
- 
+  font-size: clamp(2.8rem, 7vw, 5.6rem);
+  margin: 0 0 1.2rem;
+  text-transform: uppercase;
+  line-height: 1;
+  font-weight: 900;
 `;
 
-const Text = styled.div`
+const CardText = styled.p`
   color: white;
-  width: 100%;
-  
-  
-  font-size: 1.4em;
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 700px;
 `;
 
 const About = () => {
-    return (
-            <AboutWrapper id="about">
-              
-            <AboutContainer>
-            <Header>About me</Header>
-            <Text>
-            I am an Information and Communication Technology student with a strong passion for full-stack application development and cybersecurity. 
-My experience spans modern technologies such as React for frontend development, Node.js for backend development, and Java Spring for robust server-side applications. 
-I have built production-ready applications and deployed them on platforms like Render and Azure. Additionally, I have hands-on experience with databases, including MongoDB and PostgreSQL. 
-</Text>
-<Text>
-In the realm of cybersecurity, I am particularly drawn to ethical hacking and red team operations. I have worked with Kali Linux to configure training environments and leverage its tools for reconnaissance and exploitation. 
-I actively keep up with the latest cybersecurity trends and techniques to enhance my ability to identify and mitigate potential threats effectively. 
-My commitment to growth in this field is exemplified by my independent studies of Cisco cybersecurity courses, such as <i>Introduction to Cyber Security</i> and <i>Ethical Hacking</i>.
-</Text>
-            </AboutContainer>
-            </AboutWrapper>
-    )
-}
+  const targetRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
 
-export default About
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+  });
+
+  const x = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? ['0%', '0%'] : ['0%', '-65%']
+  );
+
+  return (
+    <MainSection ref={targetRef} id="about">
+      <StickyWrapper>
+        <HorizontalContainer style={{ x }}>
+          <ContentCard>
+            <CardTitle>Who is<br/>Niko?</CardTitle>
+            <CardText>
+              ICT student laser-focused on <b>Full-Stack Development</b> and <b>Cybersecurity</b>.
+              Building secure, performant apps is the core of what I do.
+            </CardText>
+          </ContentCard>
+
+          <ContentCard>
+            <CardTitle>The<br/>Developer</CardTitle>
+            <CardText>
+              React, Node.js, and Java Spring for front-to-back delivery.
+              From MongoDB to PostgreSQL, I design data that stays consistent and fast.
+            </CardText>
+          </ContentCard>
+
+          <ContentCard>
+            <CardTitle>The Cyber<br/>Enthusiast</CardTitle>
+            <CardText>
+              Ethical hacking and red team mindset with Kali Linux tooling.
+              Continuously sharpening reconnaissance and exploitation skills to stay ahead of threats.
+            </CardText>
+          </ContentCard>
+        </HorizontalContainer>
+      </StickyWrapper>
+    </MainSection>
+  );
+};
+
+export default About;
