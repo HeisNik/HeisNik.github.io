@@ -113,6 +113,7 @@ const CyberButton = styled.a`
     background: ${({ $accent }) => $accent || 'turquoise'};
     color: black;
     box-shadow: 0 0 20px ${({ $accent }) => $accent || 'turquoise'};
+    transform: skew(-5deg);
   }
 `;
 

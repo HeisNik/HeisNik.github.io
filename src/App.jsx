@@ -10,6 +10,7 @@ import SkillsVortex from './components/SkillsVortex'
 import SkillsCircuit from './components/SkillsCircuit'
 import GlitchCarousel from './components/GlitchCarousel'
 import Skills from './components/Skills'
+import Socials from './components/Socials'
 import ShaderBackground from './components/ShaderBackground'
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         <Skills />
         <Projects/>
         <Contact/>
+        <Socials />
       </div>
     </div>
   )
