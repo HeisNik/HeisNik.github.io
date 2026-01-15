@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Typewriter from 'typewriter-effect';
 
 
 
@@ -39,6 +40,14 @@ const Text = styled.h1`
   
 `;
 
+const RoleLine = styled.div`
+  color: turquoise;
+  display: inline-block;
+  .Typewriter__cursor {
+    color: turquoise;
+  }
+`;
+
 const Image = styled.img`
   width: 100%;
   max-width: 400px;
@@ -51,16 +60,33 @@ const Image = styled.img`
   }
 `;
 
+const roles = [
+  'Full Stack Developer',
+  '<span style="color:red;">Cyber Security Enthusiast</span>',
+];
+
 const Hero = () => {
-    return (
-    <div id="hero">
-    <HeroContainer>
-      <Text>
-        <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br /> Full Stack Developer <b style={{ color: "white" }}>and</b> <b style={{ color: "red" }}>Cyber Security Enthusiast</b>
-      </Text>
-      <Image src={`/images/IMG_9916.jpg`} alt="Description" />
-    </HeroContainer>
-    </div>
+  return (
+  <div id="hero">
+  <HeroContainer>
+    <Text>
+      <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
+      <RoleLine>
+        <Typewriter
+          options={{
+            strings: roles,
+            autoStart: true,
+            loop: true,
+            delay: 60,
+            deleteSpeed: 40,
+            pauseFor: 1200,
+          }}
+        />
+      </RoleLine>
+    </Text>
+    <Image src={`/images/IMG_9916.jpg`} alt="Description" />
+  </HeroContainer>
+  </div>
 )}
 
 export default Hero
