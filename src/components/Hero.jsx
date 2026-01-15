@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import Typewriter from 'typewriter-effect';
 
@@ -55,10 +56,10 @@ const RoleLine = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  color: turquoise;
+  color: ${({ $color }) => $color || 'turquoise'};
   
   .Typewriter__cursor {
-    color: turquoise;
+    color: ${({ $color }) => $color || 'turquoise'};
   }
 `;
 
@@ -75,26 +76,39 @@ const Image = styled.img`
 `;
 
 const roles = [
-  'Full Stack Developer',
-  '<span style="color:red;">Cyber Security Enthusiast</span>',
+  { text: 'Full Stack Developer', color: 'turquoise' },
+  { text: 'Cyber Security Enthusiast', color: 'red' },
 ];
 
 const Hero = () => {
+  const [roleColor, setRoleColor] = useState(roles[0].color);
+
   return (
   <div id="hero">
   <HeroContainer>
     <Text>
       <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
       <RoleWrapper>
-        <RoleLine>
+        <RoleLine $color={roleColor}>
           <Typewriter
+            onInit={(typewriter) => {
+              const loopRoles = () => {
+                roles.forEach(({ text, color }) => {
+                  typewriter
+                    .callFunction(() => setRoleColor(color))
+                    .typeString(text)
+                    .pauseFor(1200)
+                    .deleteAll(40);
+                });
+                typewriter.callFunction(loopRoles);
+              };
+              loopRoles();
+              typewriter.start();
+            }}
             options={{
-              strings: roles,
-              autoStart: true,
               loop: true,
               delay: 60,
               deleteSpeed: 40,
-              pauseFor: 1200,
             }}
           />
         </RoleLine>
