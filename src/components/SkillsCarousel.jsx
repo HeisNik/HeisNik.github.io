@@ -1,204 +1,249 @@
-import styled, { keyframes } from 'styled-components';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { FaReact, FaNodeJs, FaPython, FaDocker } from 'react-icons/fa';
 import { BiLogoPostgresql, BiLogoMongodb } from 'react-icons/bi';
 import { GrGraphQl } from 'react-icons/gr';
 import { SiSpring, SiRender, SiKalilinux } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
-const rotateHorizontal = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+const SkillsSection = styled.section`
+  width: 100%;
+  padding: 100px 0;
+  background: transparent;
 `;
 
-const SkillsWrapper = styled.div`
+const InnerWrapper = styled.div`
   width: 100%;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
- 
-  padding-top: 50px;
-  box-sizing: border-box;
-  overflow: hidden;
-  
-`;
-
-const SkillsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: 150px;
- 
-
-  @media (min-width: 768px) {
-    align-items: flex-start;
-  }
+  padding: 0 clamp(6vw, 8vw, 10vw);
 `;
 
 const Header = styled.h1`
   color: turquoise;
-  width: 80%;
-  max-width: 600px;
-  font-size: 5.2em;
-  text-align: center;
-  margin: 75px auto 100px;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  text-transform: uppercase;
+  font-weight: 900;
+  margin-bottom: 80px;
+`;
 
-  @media (min-width: 768px) {
-    margin: 150px auto 200px;
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const SkillCell = styled(motion.div)`
+  aspect-ratio: 1 / 1;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+  padding: 20px;
+
+  &:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(64, 224, 208, 0);
+    transition: border 0.2s;
+  }
+
+  &:hover:before {
+    border: 1px solid rgba(64, 224, 208, 0.3);
   }
 `;
 
-const IconWrapper = styled.div`
-  margin-top: 50px;
-  display: flex;
-  width: 200%;
-  animation: ${rotateHorizontal} 30s linear infinite;
-  animation-play-state: running;
-
-  &:hover {
-    animation-play-state: paused;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    height: auto;
-    width: 100%;
-    animation: none;
-  }
+const StatusText = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: ${({ $active }) => ($active ? 'turquoise' : '#333')};
+  text-transform: uppercase;
 `;
 
-const IconContainer = styled.div`
+const DecryptOverlay = styled(motion.div)`
+  position: absolute;
+  inset: 0;
+  background: #0a0a0a;
   display: flex;
-  justify-content: space-around;
-  width: 50%;
-  text-align: center;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+`;
 
-  @media (max-width: 768px) {
-    width: 100%;
-    height: auto;
-    flex-direction: column;
-  }
+const scrambleChars = '!+-_\\|;:.,';
 
-  div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-    transition: transform 0.3s, color 0.3s;
+const ScrambleText = ({ text, duration = 800, trigger }) => {
+  const prefersReducedMotion = useReducedMotion();
+  const [output, setOutput] = useState(text);
+  const [scrambleKey, setScrambleKey] = useState(0);
+  const chars = useMemo(() => text.split(''), [text]);
 
-    &:hover {
-      transform: scale(1.2);
-      color: #ff4081;
+  useEffect(() => {
+    if (!trigger || prefersReducedMotion) return undefined;
+    const interval = setInterval(() => setScrambleKey((k) => k + 1), 10000);
+    return () => clearInterval(interval);
+  }, [trigger, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (!trigger || prefersReducedMotion) {
+      setOutput(text);
+      return undefined;
     }
 
-    svg {
-      margin-bottom: 10px;
-    }
-  }
-`;
+    let frame;
+    const start = performance.now();
+    const scramble = () => {
+      const now = performance.now();
+      const t = Math.min(1, (now - start) / duration);
+      const next = chars.map((ch, idx) => {
+        const ready = t >= idx / chars.length;
+        if (ready) return ch;
+        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+      });
+      setOutput(next.join(''));
+      if (t < 1) frame = requestAnimationFrame(scramble);
+    };
+    frame = requestAnimationFrame(scramble);
+    return () => cancelAnimationFrame(frame);
+  }, [trigger, duration, chars, text, prefersReducedMotion, scrambleKey]);
 
-const SkillsCarousel = ({ isMobile }) => (
-  <SkillsWrapper id="skills">
-    <SkillsContainer>
-      <Header>Skills</Header>
-      <IconWrapper>
-        <IconContainer>
-          <div>
-            <FaReact size={75} color="#61dafb" />
-            <p>React</p>
-          </div>
-          <div>
-            <FaNodeJs size={75} color="#68a063" />
-            <p>Node.js</p>
-          </div>
-          <div>
-            <FaPython size={75} color="#336791" />
-            <p>Python</p>
-          </div>
-          <div>
-            <BiLogoPostgresql size={75} color="#336791" />
-            <p>PostgreSQL</p>
-          </div>
-          <div>
-            <BiLogoMongodb size={75} color="#68a063" />
-            <p>MongoDB</p>
-          </div>
-          <div>
-            <GrGraphQl size={75} color="#e10098" />
-            <p>GraphQL</p>
-          </div>
-          <div>
-            <FaDocker size={75} color="#0077B5" />
-            <p>Docker</p>
-          </div>
-          <div>
-            <SiSpring size={75} color="#68a063" />
-            <p>Java Spring</p>
-          </div>
-          <div>
-            <SiRender size={75} color="black" />
-            <p>Render</p>
-          </div>
-          <div>
-            <VscAzure size={75} color="#0077B5" />
-            <p>Azure</p>
-          </div>
-          <div>
-            <SiKalilinux size={75} color="black" />
-            <p>Kali Linux</p>
-          </div>
-        </IconContainer>
-        {!isMobile && (
-          <IconContainer>
-            <div>
-              <FaReact size={75} color="#61dafb" />
-              <p>React</p>
-            </div>
-            <div>
-              <FaNodeJs size={75} color="#68a063" />
-              <p>Node.js</p>
-            </div>
-            <div>
-              <FaPython size={75} color="#336791" />
-              <p>Python</p>
-            </div>
-            <div>
-              <BiLogoPostgresql size={75} color="#336791" />
-              <p>PostgreSQL</p>
-            </div>
-            <div>
-              <BiLogoMongodb size={75} color="#68a063" />
-              <p>MongoDB</p>
-            </div>
-            <div>
-              <GrGraphQl size={75} color="#e10098" />
-              <p>GraphQL</p>
-            </div>
-            <div>
-              <FaDocker size={75} color="#0077B5" />
-              <p>Docker</p>
-            </div>
-            <div>
-              <SiSpring size={75} color="#68a063" />
-              <p>Java Spring</p>
-            </div>
-            <div>
-              <SiRender size={75} color="black" />
-              <p>Render</p>
-            </div>
-            <div>
-              <VscAzure size={75} color="#0077B5" />
-              <p>Azure</p>
-            </div>
-            <div>
-              <SiKalilinux size={75} color="black" />
-              <p>Kali Linux</p>
-            </div>
-          </IconContainer>
-        )}
-      </IconWrapper>
-    </SkillsContainer>
-  </SkillsWrapper>
-);
+  return <span aria-hidden="true">{output}</span>;
+};
+
+ScrambleText.propTypes = {
+  text: PropTypes.string.isRequired,
+  duration: PropTypes.number,
+  trigger: PropTypes.bool,
+};
+
+const skills = [
+  { name: 'React', Icon: FaReact, color: '#61dafb' },
+  { name: 'Node.js', Icon: FaNodeJs, color: '#68a063' },
+  { name: 'Python', Icon: FaPython, color: '#336791' },
+  { name: 'PostgreSQL', Icon: BiLogoPostgresql, color: '#336791' },
+  { name: 'MongoDB', Icon: BiLogoMongodb, color: '#68a063' },
+  { name: 'GraphQL', Icon: GrGraphQl, color: '#e10098' },
+  { name: 'Docker', Icon: FaDocker, color: '#0077B5' },
+  { name: 'Java Spring', Icon: SiSpring, color: '#68a063' },
+  { name: 'Render', Icon: SiRender, color: '#ffffff' },
+  { name: 'Azure', Icon: VscAzure, color: '#0077B5' },
+  { name: 'Kali Linux', Icon: SiKalilinux, color: '#00adef' },
+];
+
+const SkillItem = ({ skill }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <SkillCell
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      initial={false}
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+    >
+      <StatusText $active={isHovered}>
+        {isHovered ? '[DECRYPTED]' : '[ENCRYPTED]'}
+      </StatusText>
+
+      <DecryptOverlay
+        animate={{
+          opacity: isHovered ? 0 : 1,
+          scale: isHovered ? 1.1 : 1,
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        <span style={{ color: '#333', fontSize: '1.4rem', fontFamily: 'monospace' }}>
+          <ScrambleText text="XXXXX" trigger={true} duration={2000} />
+        </span>
+      </DecryptOverlay>
+
+      <motion.div
+        animate={{
+          y: isHovered ? 0 : 12,
+          opacity: isHovered ? 1 : 0,
+        }}
+        transition={{ duration: 0.25 }}
+        style={{ zIndex: 1 }}
+      >
+        <skill.Icon size={60} color={skill.color} />
+      </motion.div>
+
+      <motion.p
+        style={{
+          marginTop: '12px',
+          color: 'white',
+          fontSize: '0.9rem',
+          fontFamily: 'monospace',
+          zIndex: 1,
+        }}
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {skill.name}
+      </motion.p>
+
+      {isHovered && (
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '110%',
+            height: '110%',
+            background: `radial-gradient(circle at center, ${skill.color}22 0%, transparent 70%)`,
+            zIndex: 0,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+        />
+      )}
+    </SkillCell>
+  );
+};
+
+SkillItem.propTypes = {
+  skill: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    Icon: PropTypes.elementType.isRequired,
+    color: PropTypes.string,
+  }).isRequired,
+};
+
+const SkillsCarousel = () => {
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, { once: false, amount: 0.5 });
+
+  return (
+    <SkillsSection id="skills">
+      <InnerWrapper>
+        <Header ref={headerRef}>
+          <ScrambleText text="Toolbox" trigger={isHeaderInView} />
+        </Header>
+
+        <Grid>
+          {skills.map((skill, index) => (
+            <SkillItem key={index} skill={skill} />
+          ))}
+        </Grid>
+      </InnerWrapper>
+    </SkillsSection>
+  );
+};
+
+SkillsCarousel.propTypes = {
+  isMobile: PropTypes.bool,
+};
 
 export default SkillsCarousel;

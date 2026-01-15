@@ -5,7 +5,11 @@ import Hero from './components/Hero'
 import About from './components/About'
 import Projects from './components/Projects'
 import Contact from './components/Contact'
-import SkillsCarouselCopy from './components/SkillsCarouselCopy'
+import SkillsCarousel from './components/SkillsCarousel'
+import SkillsVortex from './components/SkillsVortex'
+import SkillsCircuit from './components/SkillsCircuit'
+import GlitchCarousel from './components/GlitchCarousel'
+import Skills from './components/Skills'
 import ShaderBackground from './components/ShaderBackground'
 
 function App() {
@@ -34,7 +38,11 @@ function App() {
         <NavBar/>
         <Hero/>
         <About/>
-        <SkillsCarouselCopy isMobile={isMobile} isMediumScreen={isMediumScreen} />
+        <SkillsCarousel isMobile={isMobile} isMediumScreen={isMediumScreen} />
+        <SkillsVortex />
+        <SkillsCircuit />
+        <GlitchCarousel />
+        <Skills />
         <Projects/>
         <Contact/>
       </div>
