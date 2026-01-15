@@ -40,9 +40,23 @@ const Text = styled.h1`
   
 `;
 
+const RoleWrapper = styled.div`
+  position: relative;
+  min-height: 3em; /* Reserve space for mobile line breaks */
+  width: 100%;
+
+  @media (min-width: 768px) {
+    min-height: 1.5em; /* Single line on larger screens */
+  }
+`;
+
 const RoleLine = styled.div`
+  position: absolute; /* Float text within reserved space */
+  top: 0;
+  left: 0;
+  right: 0;
   color: turquoise;
-  display: inline-block;
+  
   .Typewriter__cursor {
     color: turquoise;
   }
@@ -71,18 +85,20 @@ const Hero = () => {
   <HeroContainer>
     <Text>
       <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
-      <RoleLine>
-        <Typewriter
-          options={{
-            strings: roles,
-            autoStart: true,
-            loop: true,
-            delay: 60,
-            deleteSpeed: 40,
-            pauseFor: 1200,
-          }}
-        />
-      </RoleLine>
+      <RoleWrapper>
+        <RoleLine>
+          <Typewriter
+            options={{
+              strings: roles,
+              autoStart: true,
+              loop: true,
+              delay: 60,
+              deleteSpeed: 40,
+              pauseFor: 1200,
+            }}
+          />
+        </RoleLine>
+      </RoleWrapper>
     </Text>
     <Image src={`/images/IMG_9916.jpg`} alt="Description" />
   </HeroContainer>
