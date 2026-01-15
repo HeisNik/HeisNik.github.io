@@ -34,9 +34,9 @@ const HorizontalContainer = styled(motion.div)`
 
 const ContentCard = styled(motion.div)`
   flex-shrink: 0;
-  width: 85vw;
+  width: 90vw;
   min-width: 320px;
-  max-width: 820px;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,12 +44,12 @@ const ContentCard = styled(motion.div)`
   overflow: hidden;
   hyphens: auto;
   word-wrap: break-word;
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
-  padding: clamp(1.5rem, 5vw, 3rem);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 32px;
+  padding: clamp(2rem, 5vw, 4rem);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 `;
 
 const CardBody = styled.div`
@@ -179,10 +179,103 @@ ScrambleText.propTypes = {
   trigger: PropTypes.bool,
 };
 
+const AnimatedCard = ({
+  title,
+  text,
+  icon,
+  iconStyle,
+  glowBackground,
+  parallaxOffset = 24,
+  scrambleDurations = [],
+  handleGlowMove,
+  handleGlowLeave,
+  prefersReducedMotion,
+}) => {
+  const [seen, setSeen] = useState(false);
+  const cardRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ['start end', 'start center'],
+  });
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    prefersReducedMotion ? [1, 1] : [0, 1]
+  );
+  const y = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    prefersReducedMotion ? [0, 0] : [40, 0]
+  );
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    prefersReducedMotion ? [1, 1] : [0.9, 1]
+  );
+
+  return (
+    <ContentCard
+      ref={cardRef}
+      style={{ opacity, y, scale }}
+      viewport={{ amount: 0.55 }}
+      onViewportEnter={() => setSeen(true)}
+      onMouseMove={handleGlowMove}
+      onMouseLeave={handleGlowLeave}
+    >
+      <ParallaxElement
+        offset={parallaxOffset}
+        style={{
+          fontSize: '6.5rem',
+          fontWeight: 900,
+          color: 'turquoise',
+          opacity: 0.08,
+          ...iconStyle,
+        }}
+      >
+        {icon}
+      </ParallaxElement>
+      <Glow style={{ background: glowBackground }} />
+      <CardBody>
+        <CardTitle>
+          <TitleLine>
+            <ScrambleText
+              text={title[0]}
+              trigger={seen}
+              duration={scrambleDurations[0] || 700}
+            />
+          </TitleLine>
+          <TitleLine>
+            <ScrambleText
+              text={title[1]}
+              trigger={seen}
+              duration={scrambleDurations[1] || 850}
+            />
+          </TitleLine>
+        </CardTitle>
+        <CardText>{text}</CardText>
+      </CardBody>
+    </ContentCard>
+  );
+};
+
+AnimatedCard.propTypes = {
+  title: PropTypes.arrayOf(PropTypes.string).isRequired,
+  text: PropTypes.node.isRequired,
+  icon: PropTypes.node,
+  iconStyle: PropTypes.object,
+  glowBackground: PropTypes.any,
+  parallaxOffset: PropTypes.number,
+  scrambleDurations: PropTypes.arrayOf(PropTypes.number),
+  handleGlowMove: PropTypes.func,
+  handleGlowLeave: PropTypes.func,
+  prefersReducedMotion: PropTypes.bool,
+};
+
 const About = () => {
   const targetRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
-  const [seen, setSeen] = useState([false, false, false]);
   const glowX = useMotionValue(50);
   const glowY = useMotionValue(50);
   const springX = useSpring(glowX, { stiffness: 140, damping: 18, mass: 0.35 });
@@ -190,7 +283,7 @@ const About = () => {
   const glowBackground = useMotionTemplate`
     radial-gradient(
       circle at ${springX}% ${springY}%,
-      rgba(64, 224, 208, 0.16),
+      rgba(64, 224, 208, 0.25),
       transparent 70%
     )
   `;
@@ -202,7 +295,7 @@ const About = () => {
   const x = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion ? ['0%', '0%'] : ['0%', '-65%']
+    prefersReducedMotion ? ['0%', '0%'] : ['0%', '-67%']
   );
 
   const handleGlowMove = (event) => {
@@ -219,134 +312,81 @@ const About = () => {
     glowY.set(50);
   };
 
-  const markSeen = (index) =>
-    setSeen((prev) => {
-      if (prev[index]) return prev;
-      const next = [...prev];
-      next[index] = true;
-      return next;
-    });
-
   return (
     <MainSection ref={targetRef} id="about">
       <StickyWrapper>
         <HorizontalContainer style={{ x }}>
-          <ContentCard
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            viewport={{ once: true, margin: '-100px' }}
-            onMouseMove={handleGlowMove}
-            onMouseLeave={handleGlowLeave}
-            onViewportEnter={() => markSeen(0)}
-          >
-            <ParallaxElement
-              offset={20}
-              style={{
-                right: '5%',
-                top: '6%',
-                fontSize: '6rem',
-                color: 'turquoise',
-                opacity: 0.06,
-                fontWeight: 900,
-              }}
-            >
-              0101
-            </ParallaxElement>
-            <Glow style={{ background: glowBackground }} />
-            <CardBody>
-              <CardTitle>
-                <TitleLine>
-                  <ScrambleText text="Who is" trigger={seen[0]} duration={700} />
-                </TitleLine>
-                <TitleLine>
-                  <ScrambleText text="Niko?" trigger={seen[0]} duration={820} />
-                </TitleLine>
-              </CardTitle>
-              <CardText>
+          <AnimatedCard
+            title={['Who is', 'Niko?']}
+            text={
+              <>
                 ICT student laser-focused on <b>Full-Stack Development</b> and <b>Cybersecurity</b>.
                 Building secure, performant apps is the core of what I do.
-              </CardText>
-            </CardBody>
-          </ContentCard>
+              </>
+            }
+            icon="0101"
+            iconStyle={{
+              right: '5%',
+              top: '6%',
+              fontSize: '6rem',
+              color: 'turquoise',
+              opacity: 0.06,
+            }}
+            glowBackground={glowBackground}
+            parallaxOffset={20}
+            scrambleDurations={[700, 820]}
+            handleGlowMove={handleGlowMove}
+            handleGlowLeave={handleGlowLeave}
+            prefersReducedMotion={prefersReducedMotion}
+          />
 
-          <ContentCard
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.08 }}
-            viewport={{ once: true, margin: '-100px' }}
-            onMouseMove={handleGlowMove}
-            onMouseLeave={handleGlowLeave}
-            onViewportEnter={() => markSeen(1)}
-          >
-            <ParallaxElement
-              offset={26}
-              style={{
-                left: '-4%',
-                bottom: '10%',
-                fontSize: '7rem',
-                color: '#2dd4bf',
-                opacity: 0.08,
-                fontWeight: 900,
-              }}
-            >
-              &lt;/&gt;
-            </ParallaxElement>
-            <Glow style={{ background: glowBackground }} />
-            <CardBody>
-              <CardTitle>
-                <TitleLine>
-                  <ScrambleText text="The" trigger={seen[1]} duration={650} />
-                </TitleLine>
-                <TitleLine>
-                  <ScrambleText text="Developer" trigger={seen[1]} duration={850} />
-                </TitleLine>
-              </CardTitle>
-              <CardText>
+          <AnimatedCard
+            title={['The', 'Developer']}
+            text={
+              <>
                 React, Node.js, and Java Spring for front-to-back delivery.
                 From MongoDB to PostgreSQL, I design data that stays consistent and fast.
-              </CardText>
-            </CardBody>
-          </ContentCard>
+              </>
+            }
+            icon="</>"
+            iconStyle={{
+              left: '-4%',
+              bottom: '10%',
+              fontSize: '7rem',
+              color: '#2dd4bf',
+              opacity: 0.08,
+            }}
+            glowBackground={glowBackground}
+            parallaxOffset={26}
+            scrambleDurations={[650, 850]}
+            handleGlowMove={handleGlowMove}
+            handleGlowLeave={handleGlowLeave}
+            prefersReducedMotion={prefersReducedMotion}
+          />
 
-          <ContentCard
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.16 }}
-            viewport={{ once: true, margin: '-100px' }}
-            onMouseMove={handleGlowMove}
-            onMouseLeave={handleGlowLeave}
-            onViewportEnter={() => markSeen(2)}
-          >
-            <ParallaxElement
-              offset={24}
-              style={{
-                right: '-2%',
-                bottom: '8%',
-                fontSize: '6.4rem',
-                color: '#f87171',
-                opacity: 0.07,
-                fontWeight: 800,
-              }}
-            >
-              &gt;_
-            </ParallaxElement>
-            <Glow style={{ background: glowBackground }} />
-            <CardBody>
-              <CardTitle>
-                <TitleLine>
-                  <ScrambleText text="The Cyber" trigger={seen[2]} duration={700} />
-                </TitleLine>
-                <TitleLine>
-                  <ScrambleText text="Enthusiast" trigger={seen[2]} duration={900} />
-                </TitleLine>
-              </CardTitle>
-              <CardText>
+          <AnimatedCard
+            title={['The Cyber', 'Enthusiast']}
+            text={
+              <>
                 Ethical hacking and red team mindset with Kali Linux tooling.
                 Continuously sharpening reconnaissance and exploitation skills to stay ahead of threats.
-              </CardText>
-            </CardBody>
-          </ContentCard>
+              </>
+            }
+            icon=">_"
+            iconStyle={{
+              right: '-2%',
+              bottom: '8%',
+              fontSize: '6.4rem',
+              color: '#f87171',
+              opacity: 0.07,
+            }}
+            glowBackground={glowBackground}
+            parallaxOffset={24}
+            scrambleDurations={[700, 900]}
+            handleGlowMove={handleGlowMove}
+            handleGlowLeave={handleGlowLeave}
+            prefersReducedMotion={prefersReducedMotion}
+          />
         </HorizontalContainer>
       </StickyWrapper>
     </MainSection>
