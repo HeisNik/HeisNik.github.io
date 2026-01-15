@@ -4,39 +4,39 @@ import Typewriter from 'typewriter-effect';
 
 
 
-const HeroContainer = styled.div`
+const HeroSection = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
+
+const InnerWrapper = styled.div`
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 clamp(6vw, 8vw, 10vw);
+  padding-top: 76px; /* NavBar mobile */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  padding-top: 76px; /* 20px + 56px NavBar mobile */
-  width: 100%; 
-  max-width: 1200px; 
-  margin: 0 auto;
-  
-  
-  
 
   @media (min-width: 768px) {
     flex-direction: row;
+    justify-content: space-between;
     gap: 60px; /* Pienempi gap tabletille */
-    padding: 20px;
-    padding-top: 117.78px; /* 20px + 97.78px NavBar tablet/desktop */
-  }
-
-  @media (min-width: 1024px) {
-    gap: 150px; /* Isompi gap desktopille */
+    padding-top: 117.78px; /* NavBar tablet/desktop */
   }
 `;
 
 const Text = styled.h1`
   color: turquoise;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
 
    @media (min-width: 768px) {
-    width: 80%;
-  max-width: 600px;
+    width: 100%;
+    max-width: 800px;
   }
   
 `;
@@ -84,39 +84,39 @@ const Hero = () => {
   const [roleColor, setRoleColor] = useState(roles[0].color);
 
   return (
-  <div id="hero">
-  <HeroContainer>
-    <Text>
-      <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
-      <RoleWrapper>
-        <RoleLine $color={roleColor}>
-          <Typewriter
-            onInit={(typewriter) => {
-              const loopRoles = () => {
-                roles.forEach(({ text, color }) => {
-                  typewriter
-                    .callFunction(() => setRoleColor(color))
-                    .typeString(text)
-                    .pauseFor(1200)
-                    .deleteAll(40);
-                });
-                typewriter.callFunction(loopRoles);
-              };
-              loopRoles();
-              typewriter.start();
-            }}
-            options={{
-              loop: true,
-              delay: 60,
-              deleteSpeed: 40,
-            }}
-          />
-        </RoleLine>
-      </RoleWrapper>
-    </Text>
-    <Image src={`/images/IMG_9916.jpg`} alt="Description" />
-  </HeroContainer>
-  </div>
+  <HeroSection id="hero">
+    <InnerWrapper>
+      <Text>
+        <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
+        <RoleWrapper>
+          <RoleLine $color={roleColor}>
+            <Typewriter
+              onInit={(typewriter) => {
+                const loopRoles = () => {
+                  roles.forEach(({ text, color }) => {
+                    typewriter
+                      .callFunction(() => setRoleColor(color))
+                      .typeString(text)
+                      .pauseFor(1200)
+                      .deleteAll(40);
+                  });
+                  typewriter.callFunction(loopRoles);
+                };
+                loopRoles();
+                typewriter.start();
+              }}
+              options={{
+                loop: true,
+                delay: 60,
+                deleteSpeed: 40,
+              }}
+            />
+          </RoleLine>
+        </RoleWrapper>
+      </Text>
+      <Image src={`/images/IMG_9916.jpg`} alt="Description" />
+    </InnerWrapper>
+  </HeroSection>
 )}
 
 export default Hero
