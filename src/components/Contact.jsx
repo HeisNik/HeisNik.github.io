@@ -24,16 +24,63 @@ const ContactWrapper = styled.section`
 const TerminalWindow = styled(motion.div)`
   max-width: 900px;
   margin: 0 auto;
-  background: rgba(5, 5, 5, 0.8);
+  background: rgba(5, 5, 5, 0.9); /* Hieman tummempi kontrasti */
   border: 1px solid turquoise;
   padding: 40px;
   position: relative;
   box-shadow: 0 0 40px rgba(64, 224, 208, 0.1);
   z-index: 2;
 
+  /* Estetään hakasulkeiden paukunta reunoista yli mobiilissa */
   @media (max-width: 768px) {
-    padding: 30px 20px;
-    margin: 0 20px;
+    padding: 30px 25px;
+    margin: 0 15px;
+  }
+`;
+
+const TerminalHeader = styled.div`
+  margin-bottom: clamp(30px, 8vw, 60px);
+  border-left: 4px solid turquoise;
+  padding-left: 20px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding-left: 15px;
+    border-left-width: 2px;
+  }
+`;
+
+// Tehdään otsikosta oma styled-komponentti, jotta clamp toimii varmasti
+const ResponsiveH2 = styled.h2`
+  color: white;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 0.9;
+  letter-spacing: -1px;
+  position: relative;
+  
+  /* TÄMÄ ON SE KORJAUS: 
+     Nostetaan vw-kerrointa (20vw) ja lasketaan minimiä (1.2rem).
+     Nyt se pienenee salamannopeasti! */
+  font-size: clamp(1.2rem, 6vw, 4rem); 
+
+  &::after {
+    content: 'CONTACT_ME';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: turquoise;
+    opacity: 0.15;
+    z-index: -1;
+    transform: translate(4px, 4px);
+    filter: blur(1px);
+  }
+
+  @media (max-width: 480px) {
+    letter-spacing: -0.5px; /* Helpompi luku mobiilissa */
   }
 `;
 
@@ -230,14 +277,12 @@ const Contact = () => {
             transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
           />
 
-          <div style={{ marginBottom: '40px' }}>
-            <span style={{ color: 'turquoise', fontFamily: 'monospace', fontSize: '0.8rem' }}>
-              {'// UPLINK_ESTABLISHED'}
+          <TerminalHeader>
+            <span style={{ color: 'turquoise', fontFamily: 'monospace', fontSize: '0.7rem', display: 'block', marginBottom: '10px' }}>
+              {'// INITIATE_TERMINAL_UPLINK'}
             </span>
-            <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, margin: '10px 0 0 0', textTransform: 'uppercase' }}>
-              CONTACT_ME
-            </h2>
-          </div>
+            <ResponsiveH2>CONTACT_ME</ResponsiveH2>
+          </TerminalHeader>
 
           <form onSubmit={handleSubmit}>
             <InputBrackets>
