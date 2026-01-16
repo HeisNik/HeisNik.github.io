@@ -11,34 +11,44 @@ const HeroSection = styled.div`
   justify-content: center;
 `;
 
-const InnerWrapper = styled.div`
-  width: 100%;
+const HeroInner = styled.div`
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 clamp(6vw, 8vw, 10vw);
+  padding: 0 clamp(1.5rem, 5vw, 6vw);
   padding-top: 76px; /* NavBar mobile */
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  gap: 40px;
 
   @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 60px; /* Pienempi gap tabletille */
     padding-top: 117.78px; /* NavBar tablet/desktop */
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column-reverse; /* Kuva ylös, teksti alas */
+    justify-content: center;
+    text-align: center;
+    padding-top: 100px;
+  }
+`;
+
+const HeroText = styled.div`
+  flex: 1;
+  z-index: 2;
+  
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 6rem); /* Skaalautuva fontti */
+    line-height: 0.9;
+    color: turquoise;
   }
 `;
 
 const Text = styled.h1`
   color: turquoise;
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-
-   @media (min-width: 768px) {
-    width: 100%;
-    max-width: 800px;
-  }
-  
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  line-height: 0.9;
 `;
 
 const RoleWrapper = styled.div`
@@ -85,37 +95,39 @@ const Hero = () => {
 
   return (
   <HeroSection id="hero">
-    <InnerWrapper>
-      <Text>
-        <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
-        <RoleWrapper>
-          <RoleLine $color={roleColor}>
-            <Typewriter
-              onInit={(typewriter) => {
-                const loopRoles = () => {
-                  roles.forEach(({ text, color }) => {
-                    typewriter
-                      .callFunction(() => setRoleColor(color))
-                      .typeString(text)
-                      .pauseFor(1200)
-                      .deleteAll(40);
-                  });
-                  typewriter.callFunction(loopRoles);
-                };
-                loopRoles();
-                typewriter.start();
-              }}
-              options={{
-                loop: true,
-                delay: 60,
-                deleteSpeed: 40,
-              }}
-            />
-          </RoleLine>
-        </RoleWrapper>
-      </Text>
+    <HeroInner>
+      <HeroText>
+        <Text>
+          <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
+          <RoleWrapper>
+            <RoleLine $color={roleColor}>
+              <Typewriter
+                onInit={(typewriter) => {
+                  const loopRoles = () => {
+                    roles.forEach(({ text, color }) => {
+                      typewriter
+                        .callFunction(() => setRoleColor(color))
+                        .typeString(text)
+                        .pauseFor(1200)
+                        .deleteAll(40);
+                    });
+                    typewriter.callFunction(loopRoles);
+                  };
+                  loopRoles();
+                  typewriter.start();
+                }}
+                options={{
+                  loop: true,
+                  delay: 60,
+                  deleteSpeed: 40,
+                }}
+              />
+            </RoleLine>
+          </RoleWrapper>
+        </Text>
+      </HeroText>
       <Image src={`/images/IMG_9916.jpg`} alt="Description" />
-    </InnerWrapper>
+    </HeroInner>
   </HeroSection>
 )}
 

@@ -12,6 +12,7 @@ import GlitchCarousel from './components/GlitchCarousel'
 import Skills from './components/Skills'
 import Socials from './components/Socials'
 import ShaderBackground from './components/ShaderBackground'
+import VerticalStackAbout from './components/VerticalStackAbout'
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1000);
@@ -38,6 +39,7 @@ function App() {
       <div className="relative z-10 content-wrapper">
         <NavBar/>
         <Hero/>
+        <VerticalStackAbout/>
         <About/>
         <SkillsCarousel isMobile={isMobile} isMediumScreen={isMediumScreen} />
         <SkillsVortex />

@@ -1,22 +1,5 @@
 #root {
   width: 100%;
-  min-width: 385px;
   min-height: 100vh;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.content-wrapper {
-  /* padding: 0 20px; */ /* Mobile padding - COMMENTED OUT FOR DEBUGGING */
-}
-
-@media (min-width: 768px) {
-  .content-wrapper {
-    /* padding: 0 40px; */ /* Desktop padding - COMMENTED OUT FOR DEBUGGING */
-  }
-}
-#root {
-  max-width: 1600px;
-  margin: 0 auto;
   
 }
