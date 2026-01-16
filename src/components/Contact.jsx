@@ -1,67 +1,76 @@
-import { useRef } from 'react';
-import styled, { keyframes } from 'styled-components';
+import { useRef, useState } from 'react';
+import styled from 'styled-components';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-const glitch = keyframes`
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-`;
-
-const ContactSection = styled.section`
-  width: 100%;
-  min-height: 100vh;
-  padding: 150px 0;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const InnerWrapper = styled.div`
-  width: 100%;
-  max-width: 1000px;
-  padding: 0 clamp(6vw, 8vw, 10vw);
-`;
-
-const TerminalHeader = styled.div`
-  margin-bottom: 50px;
-  border-left: 4px solid turquoise;
-  padding-left: 20px;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-`;
-
-const InputGroup = styled.div`
+const ContactWrapper = styled.section`
   position: relative;
-  width: 100%;
+  min-height: 120vh;
+  background: #000;
+  padding: 100px 0;
+  overflow: hidden;
+  /* CRT-monitorin hienovarainen välke */
+  &:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
 `;
 
-const Label = styled.label`
-  display: block;
-  font-family: monospace;
-  color: #444;
-  font-size: 0.8rem;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+const TerminalWindow = styled(motion.div)`
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(5, 5, 5, 0.8);
+  border: 1px solid turquoise;
+  padding: 40px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(64, 224, 208, 0.1);
+  z-index: 2;
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+    margin: 0 20px;
+  }
 `;
 
-const baseField = `
+const InputBrackets = styled.div`
+  position: relative;
+  margin-bottom: 30px;
+  
+  &:before { 
+    content: "["; 
+    position: absolute; 
+    left: -15px; 
+    top: 15px; 
+    color: turquoise; 
+    opacity: 0.5; 
+    font-family: monospace;
+    font-size: 1.2rem;
+  }
+  &:after { 
+    content: "]"; 
+    position: absolute; 
+    right: -15px; 
+    top: 15px; 
+    color: turquoise; 
+    opacity: 0.5; 
+    font-family: monospace;
+    font-size: 1.2rem;
+  }
+`;
+
+const StyledInput = styled.input`
   width: 100%;
   background: transparent;
   border: none;
   border-bottom: 1px solid #222;
   padding: 15px 0;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-family: 'Courier New', monospace;
   transition: all 0.3s;
 
@@ -70,142 +79,244 @@ const baseField = `
     border-bottom: 1px solid turquoise;
     box-shadow: 0 10px 20px -10px rgba(64, 224, 208, 0.3);
   }
-`;
 
-const StyledInput = styled.input`
-  ${baseField}
+  &::placeholder {
+    color: #444;
+    font-family: monospace;
+    text-transform: uppercase;
+  }
 `;
 
 const StyledTextArea = styled.textarea`
-  ${baseField}
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #222;
+  padding: 15px 0;
+  color: white;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  transition: all 0.3s;
   min-height: 150px;
   resize: none;
+
+  &:focus {
+    outline: none;
+    border-bottom: 1px solid turquoise;
+    box-shadow: 0 10px 20px -10px rgba(64, 224, 208, 0.3);
+  }
+
+  &::placeholder {
+    color: #444;
+    font-family: monospace;
+    text-transform: uppercase;
+  }
 `;
 
 const SubmitButton = styled(motion.button)`
-  margin-top: 50px;
+  margin-top: 30px;
   background: transparent;
   color: turquoise;
   border: 1px solid turquoise;
-  padding: 20px 40px;
-  font-size: 1.5rem;
+  padding: 15px 30px;
+  font-size: 1.2rem;
   font-weight: 900;
   text-transform: uppercase;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  font-family: monospace;
+  width: 100%;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: turquoise;
     color: black;
     box-shadow: 0 0 30px turquoise;
-    animation: ${glitch} 0.3s infinite;
-    clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
   }
 
-  &:active {
-    transform: scale(0.95);
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
-const StatusIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
+const SignalSocials = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 50px;
+`;
+
+const SocialLink = styled(motion.a)`
+  border: 1px solid #222;
+  padding: 15px;
+  text-decoration: none;
   font-family: monospace;
   font-size: 0.7rem;
-  color: #333;
-  margin-top: 20px;
+  color: #555;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  text-transform: uppercase;
+
+  &:hover {
+    color: ${({ $color }) => $color};
+    border-color: ${({ $color }) => $color};
+    background: ${({ $color }) => `${$color}05`};
+  }
 `;
 
-const MetaGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-top: 40px;
+const GlitchOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: monospace;
-  color: #333;
-  font-size: 0.8rem;
+  font-size: 2rem;
+  color: turquoise;
+  text-transform: uppercase;
 `;
 
 const Contact = () => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const latency = useTransform(scrollYProgress, [0, 1], ['42ms', '18ms']);
-  const packetLoss = useTransform(scrollYProgress, [0, 1], ['0.7%', '0.1%']);
-  const throughput = useTransform(scrollYProgress, [0, 1], ['1.2 Gbps', '2.4 Gbps']);
+  const [isSending, setIsSending] = useState(false);
+  const [showGlitch, setShowGlitch] = useState(false);
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: containerRef });
+  
+  // Vääristetään terminaalia skrollatessa (kuten projekteissa)
+  const skewX = useTransform(scrollYProgress, [0, 1], [0, 5]);
+  const rotateX = useTransform(scrollYProgress, [0, 1], [5, 0]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSending(true);
+    setShowGlitch(true);
+    
+    // Glitch-efekti kestää 1 sekunnin
+    setTimeout(() => {
+      setShowGlitch(false);
+      setIsSending(false);
+    }, 1000);
+  };
+
+  const socialLinks = [
+    { label: 'GITHUB_VAULT', href: 'https://github.com/HeisNik', color: 'turquoise' },
+    { label: 'LINKEDIN_NODE', href: 'https://linkedin.com/in/niko-heiskanen-47a54a2a8', color: '#0077b5' },
+    { label: 'DIRECT_COMMS', href: 'mailto:heiskanen.niko@outlook.com', color: '#f87171' },
+  ];
 
   return (
-    <ContactSection id="contact" ref={ref}>
-      <InnerWrapper>
-        <TerminalHeader>
-          <span style={{ color: 'turquoise', fontFamily: 'monospace' }}>
-            {'// INITIATE_UPLINK'}
-          </span>
-          <h2
-            style={{
-              color: 'white',
-              fontSize: 'clamp(3rem, 8vw, 6rem)',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              margin: 0,
+    <>
+      <ContactWrapper ref={containerRef} id="contact">
+        <TerminalWindow style={{ skewX, rotateX }}>
+          {/* Skannausviiva */}
+          <motion.div 
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              height: '2px', 
+              background: 'turquoise', 
+              opacity: 0.2, 
+              zIndex: 11 
             }}
-          >
-            Contact
-          </h2>
-        </TerminalHeader>
-
-        <Form>
-          <InputGroup>
-            <Label>User_Identity</Label>
-            <StyledInput type="text" placeholder="NAME" required />
-          </InputGroup>
-
-          <InputGroup>
-            <Label>Return_Address</Label>
-            <StyledInput type="email" placeholder="EMAIL" required />
-          </InputGroup>
-
-          <InputGroup>
-            <Label>Data_Payload</Label>
-            <StyledTextArea placeholder="MESSAGE_BODY" required />
-          </InputGroup>
-
-          <SubmitButton
-            whileHover={{ skewX: -5 }}
-            transition={{ type: 'spring', stiffness: 400 }}
-            type="submit"
-          >
-            Send_Signal
-          </SubmitButton>
-        </Form>
-
-        <StatusIndicator>
-          <div
-            style={{
-              width: 8,
-              height: 8,
-              background: 'turquoise',
-              borderRadius: '50%',
-              boxShadow: '0 0 10px turquoise',
-            }}
+            animate={{ top: ['0%', '100%'] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
           />
-          ENCRYPTED_CONNECTION_ACTIVE
-        </StatusIndicator>
 
-        <MetaGrid>
-          <div>
-            LATENCY: <motion.span style={{ color: 'turquoise' }}>{latency}</motion.span>
+          <div style={{ marginBottom: '40px' }}>
+            <span style={{ color: 'turquoise', fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              {'// UPLINK_ESTABLISHED'}
+            </span>
+            <h2 style={{ color: 'white', fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, margin: '10px 0 0 0', textTransform: 'uppercase' }}>
+              CONTACT_ME
+            </h2>
           </div>
-          <div>
-            PKT_LOSS: <motion.span style={{ color: 'turquoise' }}>{packetLoss}</motion.span>
-          </div>
-          <div>
-            THROUGHPUT: <motion.span style={{ color: 'turquoise' }}>{throughput}</motion.span>
-          </div>
-        </MetaGrid>
-      </InnerWrapper>
-    </ContactSection>
+
+          <form onSubmit={handleSubmit}>
+            <InputBrackets>
+              <StyledInput type="text" placeholder="USER_NAME" required />
+            </InputBrackets>
+            
+            <InputBrackets>
+              <StyledInput type="email" placeholder="EMAIL_ENCRYPTED" required />
+            </InputBrackets>
+
+            <InputBrackets>
+              <StyledTextArea placeholder="TRANSCEIVE_MESSAGE..." required />
+            </InputBrackets>
+
+            <SubmitButton 
+              type="submit"
+              disabled={isSending}
+              animate={isSending ? { scale: [1, 1.2, 0], opacity: [1, 1, 0] } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              {isSending ? 'SENDING_PULSE...' : 'INITIATE_TRANSMISSION'}
+            </SubmitButton>
+          </form>
+
+          {/* SOSIAALISET NODET */}
+          <SignalSocials>
+            {socialLinks.map((link) => (
+              <SocialLink 
+                key={link.label}
+                href={link.href} 
+                target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel={link.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+                $color={link.color}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {link.label}
+              </SocialLink>
+            ))}
+          </SignalSocials>
+        </TerminalWindow>
+        
+        {/* HUD-DATAA RUUDUN REUNOILLA */}
+        <aside style={{ 
+          position: 'absolute', 
+          right: '5%', 
+          top: '50%', 
+          transform: 'translateY(-50%)', 
+          writingMode: 'vertical-rl', 
+          color: '#111', 
+          fontFamily: 'monospace', 
+          fontSize: 'clamp(2rem, 8vw, 4rem)', 
+          fontWeight: 900, 
+          pointerEvents: 'none',
+          zIndex: 1
+        }}>
+          CONNECTION_STREAM_ACTIVE
+        </aside>
+      </ContactWrapper>
+
+      {/* FULL SCREEN GLITCH */}
+      {showGlitch && (
+        <GlitchOverlay
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: [0, 1, 1, 0],
+            clipPath: [
+              'inset(0 0 0 0)',
+              'inset(20% 0 60% 0)',
+              'inset(60% 0 20% 0)',
+              'inset(0 0 0 0)'
+            ]
+          }}
+          transition={{ duration: 1, ease: 'easeInOut' }}
+        >
+          SIGNAL_TRANSMITTED
+        </GlitchOverlay>
+      )}
+    </>
   );
 };
 
