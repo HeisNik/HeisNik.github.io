@@ -3,6 +3,23 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { motion, useScroll, useTransform, useSpring, useMotionTemplate } from 'framer-motion';
 
+const AnimatedTitle = styled(motion.h2)`
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.8;
+  margin-bottom: 20px;
+  
+  /* DESKTOP (oletus) */
+  font-size: clamp(3rem, 8vw, 6rem);
+
+  /* MOBIILI: Pienennetään reilusti ja lisätään happea */
+  @media (max-width: 768px) {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    line-height: 1.1;
+    margin-bottom: 15px;
+  }
+`;
+
 const MainSection = styled.section`
   position: relative;
   height: 400vh; 
@@ -32,7 +49,7 @@ const ScreenLayer = styled(motion.div)`
 const ContentContainer = styled.div`
   width: 100%;
   max-width: 1400px;
-  padding: 0 clamp(6vw, 8vw, 10vw);
+  padding: 0 clamp(20px, 8vw, 10vw);
   display: flex;
   flex-direction: column;
   z-index: 2;
@@ -74,20 +91,15 @@ const Layer = ({ index, screen, total, progress }) => {
       }}
     >
       <ContentContainer>
-        <motion.h2 
-          style={{ 
-            color: screen.textColor, 
-            fontSize: 'clamp(4rem, 12vw, 9rem)', 
-            fontWeight: 900, 
-            textTransform: 'uppercase',
-            lineHeight: 0.8,
-            marginBottom: '40px',
-            opacity: titleOpacity,
-            y: titleY
-          }}
-        >
-          {screen.title}
-        </motion.h2>
+      <AnimatedTitle 
+  style={{ 
+    color: screen.textColor, 
+    opacity: titleOpacity,
+    y: titleY,
+  }}
+>
+  {screen.title}
+</AnimatedTitle>
         
         <motion.p 
           style={{ 
