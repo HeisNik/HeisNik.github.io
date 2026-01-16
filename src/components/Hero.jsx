@@ -14,74 +14,81 @@ const HeroSection = styled.div`
 const HeroInner = styled.div`
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 5vw, 6vw);
-  padding-top: 76px; /* NavBar mobile */
+  padding: 120px clamp(1.5rem, 5vw, 6vw) 60px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Pitää elementit keskellä */
   min-height: 100vh;
-  gap: 40px;
-
-  @media (min-width: 768px) {
-    padding-top: 117.78px; /* NavBar tablet/desktop */
-  }
-
-  @media (max-width: 900px) {
-    flex-direction: column-reverse; /* Kuva ylös, teksti alas */
-    justify-content: center;
-    text-align: center;
-    padding-top: 100px;
-  }
-`;
-
-const HeroText = styled.div`
-  flex: 1;
-  z-index: 2;
-  
-  h1 {
-    font-size: clamp(2.5rem, 8vw, 6rem); /* Skaalautuva fontti */
-    line-height: 0.9;
-    color: turquoise;
-  }
-`;
-
-const Text = styled.h1`
-  color: turquoise;
-  font-size: clamp(2.5rem, 8vw, 6rem);
-  line-height: 0.9;
-`;
-
-const RoleWrapper = styled.div`
-  position: relative;
-  min-height: 3em; /* Reserve space for mobile line breaks */
+  gap: clamp(20px, 5vw, 80px); /* Joustava väli */
   width: 100%;
 
-  @media (min-width: 768px) {
-    min-height: 1.5em; /* Single line on larger screens */
+  @media (max-width: 1140px) {
+    flex-direction: column-reverse;
+    text-align: center;
   }
 `;
 
-const RoleLine = styled.div`
-  position: absolute; /* Float text within reserved space */
-  top: 0;
-  left: 0;
-  right: 0;
-  color: ${({ $color }) => $color || 'turquoise'};
+const HeroContent = styled.div`
+  flex: 1;
+  min-width: 0;
+  z-index: 2;
+
+  h1 {
+    /* 1.2rem minimi, 6vw on vauhti, 3.5rem on maksimi */
+    font-size: clamp(1.2rem, 4.5vw, 3.2rem); 
+    line-height: 1.1;
+    color: white;
+    /* Sallitaan rivitys, jotta se ei mene kuvan päälle */
+    white-space: normal; 
+    /* Estetään kuitenkin nimen katkeaminen keskeltä sanaa */
+    word-break: keep-all; 
+
+    @media (max-width: 1140px) {
+      text-align: center;
+      font-size: clamp(1.1rem, 8vw, 2.5rem);
+    }
+  }
+`;
+const RoleLine = styled.div` /* Vaihdettu span -> div, varmempi block-käytös */
+  color: ${props => props.$color || 'turquoise'} !important;
+  display: block;
   
-  .Typewriter__cursor {
-    color: ${({ $color }) => $color || 'turquoise'};
+  /* SALLITAAN RIVITYS */
+  white-space: normal; 
+  word-wrap: break-word;
+  
+  /* POISTETAAN OVERFLOW HIDDEN, jotta teksti saa näkyä */
+  overflow: visible; 
+  
+  /* VARATAAN TILA: 
+     Laitetaan min-height niin korkeaksi, että 2-3 riviä mahtuu mobiilissa 
+     ilman että laatikon koko muuttuu */
+  min-height: 3.6em; /* 3 riviä (3 x 1.2em) */
+  line-height: 1.2em;
+  
+  @media (min-width: 1141px) {
+    min-height: 4.4em; /* Desktopissa riittää yksi rivi */
+  }
+
+  margin: 0;
+  padding: 0;
+  
+  .Typewriter {
+    display: inline;
   }
 `;
-
 const Image = styled.img`
+  /* flex-shrink: 1 sallii kuvan pienenemisen vähän, jos teksti tarvitsee tilaa */
+  flex: 0 1 400px; 
   width: 100%;
   max-width: 400px;
+  height: auto;
   border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(1.2, 1.2, 1.2, 1.2);
-  transition: box-shadow 0.6s ease-in-out;
+  object-fit: cover;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 
-  &:hover {
-    box-shadow: 0 16px 16px rgba(1.2, 1.2, 1.2, 1.2);
+  @media (max-width: 900px) {
+    max-width: 280px;
   }
 `;
 
@@ -94,13 +101,12 @@ const Hero = () => {
   const [roleColor, setRoleColor] = useState(roles[0].color);
 
   return (
-  <HeroSection id="hero">
-    <HeroInner>
-      <HeroText>
-        <Text>
-          <b style={{ color: "white" }}>I&apos;m Niko Heiskanen</b> <br />
-          <RoleWrapper>
-            <RoleLine $color={roleColor}>
+    <HeroSection id="hero">
+      <HeroInner>
+        <HeroContent>
+          <h1>
+            I&apos;m Niko Heiskanen
+            <RoleLine $color={roleColor} as="span">
               <Typewriter
                 onInit={(typewriter) => {
                   const loopRoles = () => {
@@ -123,13 +129,13 @@ const Hero = () => {
                 }}
               />
             </RoleLine>
-          </RoleWrapper>
-        </Text>
-      </HeroText>
-      <Image src={`/images/IMG_9916.jpg`} alt="Description" />
-    </HeroInner>
-  </HeroSection>
-)}
+          </h1>
+        </HeroContent>
+        <Image src="/images/IMG_9916.jpg" alt="Niko Heiskanen" />
+      </HeroInner>
+    </HeroSection>
+  );
+}
 
 export default Hero
 
