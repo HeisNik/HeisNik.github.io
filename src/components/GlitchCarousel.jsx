@@ -125,3 +125,4 @@ const GlitchCarousel = () => {
 
 export default GlitchCarousel;
 
+
