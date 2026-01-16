@@ -5,7 +5,7 @@ import Projects from './components/Projects'
 import Contact from './components/Contact'
 import ShaderBackground from './components/ShaderBackground'
 import VerticalStackAbout from './components/VerticalStackAbout'
-import CyberGridtoolbox from './components/CyberGridtoolbox'
+import CyberGridToolbox from './components/CyberGridToolbox'
 
 function App() {
 
@@ -20,7 +20,7 @@ function App() {
         <NavBar/>
         <Hero/>
         <VerticalStackAbout/>
-        <CyberGridtoolbox />
+        <CyberGridToolbox />
         <Projects/>
         <Contact/>
       </div>
