@@ -216,7 +216,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 
     @media (max-width: 1140px) {
       text-align: center;
-      font-size: clamp(1.1rem, 8vw, 2.5rem);
+      font-size: clamp(1.1rem, 7vw, 2.5rem);
     }
   }
 `,A7=$.div`
