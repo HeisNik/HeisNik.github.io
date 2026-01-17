@@ -5,11 +5,10 @@ import NavBar from './components/NavBar'
 import Hero from './components/Hero'
 import Projects from './components/Projects'
 import Contact from './components/Contact'
-import CyberBackground from './components/CyberBackground'
 import VerticalStackAbout from './components/VerticalStackAbout'
 import CyberGridToolbox from './components/CyberGridToolbox'
 import Preloader from './components/Preloader'
-import BackgroundDecor from './components/BackgroundDecor'
+
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
