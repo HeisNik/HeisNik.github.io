@@ -27,77 +27,42 @@ const StickyWrapper = styled.div`
 
 const HorizontalTrack = styled(motion.div)`
   display: flex;
-  /* Lasketaan gap: min 20px (mobiili), ihanne 5vw, max 100px (desktop) */
-  gap: clamp(20px, 5vw, 100px); 
-  padding: 0 10vw;
   align-items: center;
-  padding-right: 20vw;
-
-  @media (max-width: 1024px) {
-    /* Tabletilla kiristetään väliä entisestään */
-    gap: clamp(20px, 4vw, 50px);
-    padding: 0 7vw;
-  }
-
-  @media (max-width: 768px) {
-    gap: 30px;
-    padding: 0 5vw;
-    padding-right: 15vw;
-  }
+  /* GAP: Skaalautuu 20px -> 80px riippuen näytöstä. Ei media queryjä. */
+  gap: clamp(20px, 2vw, 100px);
+  padding-left: 5vw;
+  
 `;
+
 const HeaderBox = styled.div`
   flex-shrink: 0;
-  /* Desktopissa 40vw, mobiilissa lähes koko ruutu jotta teksti mahtuu */
-  width: clamp(300px, 40vw, 600px);
-  padding-right: 5vw;
-  
-  span {
-    color: turquoise;
-    font-family: monospace;
-    font-size: clamp(0.7rem, 2vw, 1rem);
-    display: block;
-    margin-bottom: clamp(5px, 1vh, 15px);
-  }
+  /* LEVEYS: Skaalautuu dynaamisesti välillä 250px - 500px */
+  width: clamp(250px, 30vw, 500px);
+  padding-right: clamp(20px, 30vw, 900px);
   
   h2 {
     color: white;
     font-weight: 900;
-    margin: 0;
-    text-transform: uppercase;
-    line-height: 0.85; /* Tiukempi riviväli tekee siitä pro-näkymän */
-    
-    /* Desktop: max 6rem 
-       Mobiili: pienennetään reilusti, esim. max 3rem 
-    */
-    font-size: clamp(2.2rem, 7vw, 6rem);
-  }
-
-  @media (max-width: 768px) {
-    width: 80vw;
-    padding-right: 10vw;
-    
-    h2 {
-      /* Pakotetaan mobiilissa pienemmäksi jos clamp ei riitä */
-      font-size: 2.8rem; 
-    }
-  }
-
-  @media (max-width: 480px) {
-    h2 {
-      font-size: 2.2rem;
-    }
+    line-height: 0.85;
+    /* TEKSTI: Skaalautuu välillä 2.2rem - 6rem */
+    font-size: clamp(2.2rem, 8vw, 8rem);
+  
   }
 `;
 
 const SkillItemSimple = styled.div`
   flex-shrink: 0;
-  width: clamp(280px, 65vw, 500px);
+  /* TÄMÄ ON SE RATKAISU: 
+     Leveys on mobiilissa/tabletissa lähes koko ruutu (80vw),
+     mutta maksimi on 600px, jottei se karkaa desktopissa liian suureksi.
+  */
+  width: clamp(300px, 60vw, 600px);
+  
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  /* TÄRKEÄ: Tämä pitää numeron kortin sisällä */
-  position: relative; 
+  position: relative;
   z-index: 1;
 
   h3 {
@@ -105,35 +70,20 @@ const SkillItemSimple = styled.div`
     font-size: clamp(1.5rem, 5vw, 3rem);
     margin: 15px 0;
     font-family: monospace;
-    font-weight: 800;
-  }
-  
-  .category {
-    color: turquoise;
-    font-family: monospace;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-  }
-
-  @media (max-width: 768px) {
-    width: 85vw;
   }
 `;
 
 const BigNumber = styled.div`
   position: absolute;
-  /* Pienennetään hieman jotta mahtuu kortin sisään paremmin */
-  font-size: clamp(8rem, 20vw, 18rem);
+  /* NUMERO: Skaalautuu itemin mukana */
+  font-size: clamp(8rem, 25vw, 20rem);
   font-weight: 900;
   color: rgba(255, 255, 255, 0.04);
   z-index: -1;
-  font-family: monospace;
-  pointer-events: none;
-  line-height: 1;
-  /* Keskitetään korttiin */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -60%);
+  pointer-events: none;
 `;
 
 
