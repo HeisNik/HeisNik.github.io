@@ -250,6 +250,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     border: 1px solid rgba(64, 224, 208, 0.3);
     border-radius: 25px;
     z-index: -1;
+
+    /* TÄMÄ POISTAA REUNUKSEN MOBIILISSA */
+    @media (max-width: 1140px) {
+      display: none;
+    }
   }
 
   @media (max-width: 900px) {
