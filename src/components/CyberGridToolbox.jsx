@@ -1,10 +1,7 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { 
-  motion, useScroll, useSpring, useTransform, 
-  useVelocity, useMotionTemplate, useReducedMotion
-} from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaReact, FaNodeJs, FaPython, FaDocker } from 'react-icons/fa';
 import { BiLogoPostgresql, BiLogoMongodb } from 'react-icons/bi';
 import { GrGraphQl } from 'react-icons/gr';
@@ -13,86 +10,53 @@ import { VscAzure } from 'react-icons/vsc';
 
 // --- STYLED COMPONENTS ---
 
-const SectionWrapper = styled.section`
-  width: 100%;
-  padding: 150px 0;
+const MainContainer = styled.section`
+  height: 400vh; /* Tämä luo skrollausmatkan pystysuunnassa */
   background: #000;
-  overflow: hidden;
-`;
-
-const InnerWrapper = styled.div`
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0 clamp(20px, 8vw, 10vw);
-`;
-
-const Grid = styled(motion.div)`
-  display: grid;
-  /* Grid säätyy mobiiliin automaattisesti */
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 2px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  perspective: 1000px;
-
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const SkillCell = styled(motion.div)`
-  aspect-ratio: 1 / 1;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   position: relative;
-  overflow: hidden;
-  cursor: crosshair;
-
-  &:after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border: 1px solid transparent;
-    transition: border 0.3s;
-  }
-  &:hover:after {
-    border: 1px solid rgba(64, 224, 208, 0.3);
-  }
 `;
 
-const StatusText = styled.div`
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  font-family: monospace;
-  font-size: 0.55rem;
-  color: ${({ $active }) => ($active ? 'turquoise' : '#333')};
-  z-index: 3;
-`;
-
-const DecryptOverlay = styled(motion.div)`
-  position: absolute;
-  inset: 0;
-  background: #000;
+const StickyWrapper = styled.div`
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 2;
-  pointer-events: none;
+  overflow: hidden; /* Piilottaa ylitse menevät osat */
 `;
 
-const Header = styled.div`
-  margin-bottom: 60px;
+const HorizontalTrack = styled(motion.div)`
+  display: flex;
+  /* Lasketaan gap: min 20px (mobiili), ihanne 5vw, max 100px (desktop) */
+  gap: clamp(20px, 5vw, 100px); 
+  padding: 0 10vw;
+  align-items: center;
+  padding-right: 20vw;
+
+  @media (max-width: 1024px) {
+    /* Tabletilla kiristetään väliä entisestään */
+    gap: clamp(20px, 4vw, 50px);
+    padding: 0 7vw;
+  }
+
+  @media (max-width: 768px) {
+    gap: 30px;
+    padding: 0 5vw;
+    padding-right: 15vw;
+  }
+`;
+const HeaderBox = styled.div`
+  flex-shrink: 0;
+  /* Desktopissa 40vw, mobiilissa lähes koko ruutu jotta teksti mahtuu */
+  width: clamp(300px, 40vw, 600px);
+  padding-right: 5vw;
   
   span {
     color: turquoise;
     font-family: monospace;
+    font-size: clamp(0.7rem, 2vw, 1rem);
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: clamp(5px, 1vh, 15px);
   }
   
   h2 {
@@ -100,218 +64,150 @@ const Header = styled.div`
     font-weight: 900;
     margin: 0;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.85; /* Tiukempi riviväli tekee siitä pro-näkymän */
     
-    /* DESKTOP: Max 5rem */
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    /* Desktop: max 6rem 
+       Mobiili: pienennetään reilusti, esim. max 3rem 
+    */
+    font-size: clamp(2.2rem, 7vw, 6rem);
+  }
 
-    /* MOBIILI: Pienennetään reilusti (alle 768px) */
-    @media (max-width: 768px) {
-      /* 1.8rem on siisti ja riittävän suuri mobiiliin, 10vw hoitaa pehmeän skaalauksen */
-      font-size: clamp(1.8rem, 10vw, 2.5rem);
+  @media (max-width: 768px) {
+    width: 80vw;
+    padding-right: 10vw;
+    
+    h2 {
+      /* Pakotetaan mobiilissa pienemmäksi jos clamp ei riitä */
+      font-size: 2.8rem; 
+    }
+  }
+
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 2.2rem;
     }
   }
 `;
 
-// --- APUKOMPONENTIT ---
+const SkillItemSimple = styled.div`
+  flex-shrink: 0;
+  width: clamp(280px, 65vw, 500px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* TÄRKEÄ: Tämä pitää numeron kortin sisällä */
+  position: relative; 
+  z-index: 1;
 
-const scrambleChars = '!+-_\\|;:.,#';
+  h3 {
+    color: white;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    margin: 15px 0;
+    font-family: monospace;
+    font-weight: 800;
+  }
+  
+  .category {
+    color: turquoise;
+    font-family: monospace;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
 
-const ScrambleText = ({ text, duration = 800, trigger }) => {
-  const prefersReducedMotion = useReducedMotion();
-  const [output, setOutput] = useState(text);
-  const chars = useMemo(() => text.split(''), [text]);
+  @media (max-width: 768px) {
+    width: 85vw;
+  }
+`;
 
-  useEffect(() => {
-    if (!trigger || prefersReducedMotion) {
-      setOutput(text);
-      return;
-    }
+const BigNumber = styled.div`
+  position: absolute;
+  /* Pienennetään hieman jotta mahtuu kortin sisään paremmin */
+  font-size: clamp(8rem, 20vw, 18rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.04);
+  z-index: -1;
+  font-family: monospace;
+  pointer-events: none;
+  line-height: 1;
+  /* Keskitetään korttiin */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+`;
 
-    let frame;
-    const start = performance.now();
-    const scramble = () => {
-      const t = Math.min(1, (performance.now() - start) / duration);
-      const next = chars.map((ch, idx) => {
-        if (t >= idx / chars.length) return ch;
-        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-      });
-      setOutput(next.join(''));
-      if (t < 1) frame = requestAnimationFrame(scramble);
-    };
-    frame = requestAnimationFrame(scramble);
-    return () => cancelAnimationFrame(frame);
-  }, [trigger, duration, chars, text, prefersReducedMotion]);
-
-  return <span aria-hidden="true">{output}</span>;
-};
-
-ScrambleText.propTypes = {
-  text: PropTypes.string.isRequired,
-  duration: PropTypes.number,
-  trigger: PropTypes.bool.isRequired,
-};
-
-// --- PÄÄKOMPONENTIT ---
-
-const SkillItem = ({ skill, velocity, globalTick }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  // Kortti menee "lukkoon" jos se ei ole hoveroitu JA globaali sykli osuu kohdalle
-  // Käytetään arpaa (Math.random), jotta kaikki kortit eivät lukitu kerralla
-  const [isLocked, setIsLocked] = useState(true);
-
-  // Velocity-pohjaiset efektit (RGB-glitch ja blur) - säilytetään scroll-efektit
-  const shift = useTransform(velocity, [-1, 1], [-15, 15]);
-  const shiftNeg = useTransform(shift, (s) => -s);
-  const glitchOpacity = useTransform(velocity, [-1, 0, 1], [0.5, 0, 0.5]);
-  const blurValue = useTransform(velocity, [-1, 0, 1], [4, 0, 4]);
-  const blurFilter = useMotionTemplate`blur(${blurValue}px)`;
-
-  // Reagoidaan globaaliin sykliin
-  useEffect(() => {
-    if (!isHovered) {
-      let unlockTimeout;
-      // Satunnainen viive ennen lukitusta luo "yksitellen vaihtuvat kirjaimet" -efektin
-      const timeout = setTimeout(() => {
-        setIsLocked(true);
-        // Automaattinen "unlock" hetken päästä
-        unlockTimeout = setTimeout(() => setIsLocked(false), 2000);
-      }, Math.random() * 1000);
-      
-      return () => {
-        clearTimeout(timeout);
-        if (unlockTimeout) clearTimeout(unlockTimeout);
-      };
-    }
-  }, [globalTick, isHovered]);
-
-  return (
-    <SkillCell
-      onMouseEnter={() => { setIsHovered(true); setIsLocked(false); }}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{ filter: blurFilter }}
-    >
-      <StatusText $active={!isLocked}>
-        {isLocked ? '[ENCRYPTING...]' : isHovered ? '[DECRYPTED]' : '[SECURE]'}
-      </StatusText>
-
-      {/* Musta peittoefekti (Lentokenttä-taulu) */}
-      <DecryptOverlay
-        animate={{
-          opacity: isLocked ? 1 : 0,
-          y: isLocked ? 0 : -20, // Liukuu pois päältä
-        }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
-      >
-        <span style={{ color: '#222', fontSize: '1.2rem', fontFamily: 'monospace' }}>
-          <ScrambleText text="#####" trigger={isLocked} duration={1500} />
-        </span>
-      </DecryptOverlay>
-
-      {/* RGB Ghost efektit skrollatessa */}
-      <motion.div style={{ position: 'absolute', x: shift, opacity: glitchOpacity, color: '#ff4081', zIndex: 1 }}>
-        <skill.Icon size={50} />
-      </motion.div>
-      <motion.div style={{ position: 'absolute', x: shiftNeg, opacity: glitchOpacity, color: '#00ffff', zIndex: 1 }}>
-        <skill.Icon size={50} />
-      </motion.div>
-
-      <motion.div
-        animate={{
-          scale: isLocked ? 0.8 : (isHovered ? 1.1 : 1),
-          opacity: isLocked ? 0 : 1,
-          filter: isLocked ? 'blur(10px)' : (isHovered ? 'hue-rotate(90deg)' : 'none')
-        }}
-        style={{ zIndex: 1 }}
-      >
-        <skill.Icon size={50} color={isHovered ? 'turquoise' : skill.color} />
-      </motion.div>
-
-      <motion.p
-        style={{
-          marginTop: '12px',
-          color: 'white',
-          fontSize: '0.8rem',
-          fontFamily: 'monospace',
-          zIndex: 1,
-        }}
-        animate={{ opacity: isLocked ? 0 : 1 }}
-      >
-        <ScrambleText text={skill.name} trigger={!isLocked} />
-      </motion.p>
-    </SkillCell>
-  );
-};
-
-SkillItem.propTypes = {
-  skill: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    Icon: PropTypes.elementType.isRequired,
-    color: PropTypes.string,
-  }).isRequired,
-  velocity: PropTypes.any.isRequired,
-  globalTick: PropTypes.number.isRequired,
-};
 
 const skills = [
-  { name: 'React', Icon: FaReact, color: '#61dafb' },
-  { name: 'Node.js', Icon: FaNodeJs, color: '#68a063' },
-  { name: 'Python', Icon: FaPython, color: '#336791' },
-  { name: 'PostgreSQL', Icon: BiLogoPostgresql, color: '#336791' },
-  { name: 'MongoDB', Icon: BiLogoMongodb, color: '#68a063' },
-  { name: 'GraphQL', Icon: GrGraphQl, color: '#e10098' },
-  { name: 'Docker', Icon: FaDocker, color: '#0077B5' },
-  { name: 'Java Spring', Icon: SiSpring, color: '#68a063' },
-  { name: 'Render', Icon: SiRender, color: '#ffffff' },
-  { name: 'Azure', Icon: VscAzure, color: '#0077B5' },
-  { name: 'Kali Linux', Icon: SiKalilinux, color: '#00adef' },
+  { name: 'React', Icon: FaReact, color: '#61dafb', category: 'FRONTEND' },
+  { name: 'Node.js', Icon: FaNodeJs, color: '#68a063', category: 'BACKEND' },
+  { name: 'Python', Icon: FaPython, color: '#336791', category: 'BACKEND' },
+  { name: 'PostgreSQL', Icon: BiLogoPostgresql, color: '#336791', category: 'DATABASE' },
+  { name: 'MongoDB', Icon: BiLogoMongodb, color: '#68a063', category: 'DATABASE' },
+  { name: 'GraphQL', Icon: GrGraphQl, color: '#e10098', category: 'API' },
+  { name: 'Docker', Icon: FaDocker, color: '#0077B5', category: 'DEVOPS' },
+  { name: 'Java Spring', Icon: SiSpring, color: '#68a063', category: 'BACKEND' },
+  { name: 'Render', Icon: SiRender, color: '#ffffff', category: 'CLOUD' },
+  { name: 'Azure', Icon: VscAzure, color: '#0077B5', category: 'CLOUD' },
+  { name: 'Kali Linux', Icon: SiKalilinux, color: '#00adef', category: 'SECURITY' },
 ];
 
 const CyberGridToolbox = ({ skills: customSkills }) => {
   const targetRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: targetRef });
-  const scrollVelocity = useVelocity(scrollYProgress);
-  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 300 });
-
-  // Gridin vääntyminen skrollatessa
-  const skewX = useTransform(smoothVelocity, [-1, 1], [-12, 12]);
-  const rotateY = useTransform(smoothVelocity, [-1, 1], [-8, 8]);
-
-  // Globaali sykli joka pakottaa kortit satunnaisesti takaisin "lukittuun" tilaan
-  const [globalTick, setGlobalTick] = useState(0);
-
-  // Luodaan globaali "syke" joka 8. sekunti
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGlobalTick(prev => prev + 1);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
+  const trackRef = useRef(null); // Ref radalle matkan laskemista varten
+  const [scrollRange, setScrollRange] = useState(0);
 
   const skillsToUse = customSkills || skills;
 
-  return (
-    <SectionWrapper ref={targetRef} id="skills">
-      <InnerWrapper>
-        <Header>
-          <motion.span>
-            <ScrambleText text="// RECONNAISSANCE_LOG: REVEALING_CORE_STACK" trigger={true} />
-          </motion.span>
-          <h2>TOOLBOX</h2>
-        </Header>
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+  });
 
-        <Grid style={{ skewX, rotateY }}>
+  // Lasketaan tarkka rullausmatka pikseleinä
+  useEffect(() => {
+    const calculateRange = () => {
+      if (trackRef.current) {
+        // Matka = Radan koko miinus ruudun leveys
+        const range = trackRef.current.scrollWidth - window.innerWidth;
+        setScrollRange(-range);
+      }
+    };
+
+    calculateRange();
+    window.addEventListener('resize', calculateRange);
+    return () => window.removeEventListener('resize', calculateRange);
+  }, [skillsToUse]);
+
+  // Alkuperäinen muunnos (pikselit ovat vakaampia kuin prosentit)
+  const xRaw = useTransform(scrollYProgress, [0, 1], [0, scrollRange]);
+  
+  // Lisää spring-fysiikka (tekee liikkeestä sulavamman/pehmeämmän)
+  const x = useSpring(xRaw, { stiffness: 400, damping: 90, mass: 1 });
+
+  return (
+    <MainContainer ref={targetRef} id="skills">
+      <StickyWrapper>
+        {/* Lisätty ref={trackRef} */}
+        <HorizontalTrack ref={trackRef} style={{ x }}>
+          
+          <HeaderBox>
+            <span>{'//'} RECONNAISSANCE_LOG</span>
+            <h2>TOOLBOX</h2>
+          </HeaderBox>
+
           {skillsToUse.map((skill, index) => (
-            <SkillItem 
-              key={index} 
-              skill={skill} 
-              velocity={smoothVelocity} 
-              globalTick={globalTick}
-            />
+            <SkillItemSimple key={index}>
+              <BigNumber>{String(index + 1).padStart(2, '0')}</BigNumber>
+              <div style={{ filter: `drop-shadow(0 0 20px ${skill.color}44)` }}>
+                <skill.Icon size={120} color={skill.color} />
+              </div>
+              <h3 style={{ margin: '15px 0' }}>{skill.name}</h3>
+              <div className="category">{'>'} {skill.category}</div>
+            </SkillItemSimple>
           ))}
-        </Grid>
-      </InnerWrapper>
-    </SectionWrapper>
+
+        </HorizontalTrack>
+      </StickyWrapper>
+    </MainContainer>
   );
 };
 
