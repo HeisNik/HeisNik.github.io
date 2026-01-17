@@ -2,30 +2,39 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import Typewriter from 'typewriter-effect';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import BackgroundDecor from './BackgroundDecor';
 
 const HeroSection = styled.section`
   width: 100%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  position: relative;
+  /* TÄRKEÄ: Tämä pitää taustan osion sisällä */
+  position: relative; 
   overflow: hidden;
+ 
 `;
 
 const HeroInner = styled.div`
   max-width: 1600px;
   margin: 0 auto;
+  /* Palautetaan 120px yläreunaan, jotta se ei mene NavBarin alle */
   padding: 120px clamp(1.5rem, 5vw, 6vw) 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  gap: clamp(20px, 5vw, 80px);
+  
+  /* MUUTOS: Poistetaan min-height tästä, koska se on jo HeroSectionissa */
+  /* Tämä estää osiota venymästä "liikaa" */
   width: 100%;
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 1140px) {
     flex-direction: column-reverse;
     text-align: center;
+    /* Mobiilissa pidetään 100px-120px ylhäällä, jotta kuva ei huku naviin */
+    padding: 110px 1.5rem 40px;
   }
 `;
 
@@ -43,7 +52,7 @@ const HeroContent = styled(motion.div)`
 
     @media (max-width: 1140px) {
       text-align: center;
-      font-size: clamp(1.1rem, 8vw, 2.5rem);
+      font-size: clamp(1.1rem, 7vw, 2.5rem);
     }
   }
 `;
@@ -81,6 +90,11 @@ const ImageContainer = styled(motion.div)`
     border: 1px solid rgba(64, 224, 208, 0.3);
     border-radius: 25px;
     z-index: -1;
+
+    /* TÄMÄ POISTAA REUNUKSEN MOBIILISSA */
+    @media (max-width: 1140px) {
+      display: none;
+    }
   }
 
   @media (max-width: 900px) {
@@ -142,6 +156,7 @@ const Hero = () => {
 
   return (
     <HeroSection id="hero">
+      <BackgroundDecor />
       <HeroInner>
         <HeroContent 
           style={{ x: textX, opacity: textOpacity }}

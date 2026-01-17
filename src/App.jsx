@@ -9,6 +9,7 @@ import CyberBackground from './components/CyberBackground'
 import VerticalStackAbout from './components/VerticalStackAbout'
 import CyberGridToolbox from './components/CyberGridToolbox'
 import Preloader from './components/Preloader'
+import BackgroundDecor from './components/BackgroundDecor'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,6 @@ function App() {
           animate={{ opacity: 1 }} 
           transition={{ duration: 1.5 }} // Hidas feidaus mustasta
         >
-          <CyberBackground />
           <div className="relative z-10 content-wrapper">
             <NavBar/>
             <Hero/>
